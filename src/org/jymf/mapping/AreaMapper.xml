@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.AreaMapper">
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Area">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="level" jdbcType="INTEGER" property="level" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, NAME,level
+  </sql>
+  
+  <!-- 查询所有区域信息 -->
+  <select id="findAll" resultType="org.jymf.entity.Area">
+  	select t.name from tbl_area t where  mod(t.id,100)=0
+  </select>
+  
+  <select id="queryAll" resultType="java.lang.String">
+  	select t.name from tbl_area t
+  </select>
+  
+  <select id="queryAreaByName" parameterType="java.lang.String" resultType="org.jymf.entity.Area">
+  	select
+  	<include refid="Base_Column_List" /> 
+  	from tbl_area where NAME = #{name,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryAreaById" parameterType="java.math.BigDecimal" resultType="org.jymf.entity.Area">
+  	select
+  	<include refid="Base_Column_List" /> 
+  	from tbl_area where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  
+   <select id="queryAreaByNameLike" parameterType="java.lang.String" resultType="org.jymf.entity.Area">
+  	select
+  	<include refid="Base_Column_List" /> 
+  	from tbl_area where NAME LIKE '%#{name,jdbcType=VARCHAR}%'
+  </select>
+  
+   <select id="getAllObjects" resultType="org.jymf.entity.Area">
+  	select
+  	<include refid="Base_Column_List" /> 
+  	from tbl_area
+  	where name like '%云南省%'
+  </select>
+</mapper>

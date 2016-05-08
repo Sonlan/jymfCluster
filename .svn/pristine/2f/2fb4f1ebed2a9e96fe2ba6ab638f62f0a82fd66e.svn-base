@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.AcInfoMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.AcInfo" >
+    <result column="labelId" property="labelId" jdbcType="DECIMAL" />
+    <result column="productId" property="productId" jdbcType="DECIMAL" />
+    <result column="productName" property="productName" jdbcType="VARCHAR" />
+    <result column="salesAreaName" property="salesAreaName" jdbcType="VARCHAR" />
+    <result column="collisionAreaName" property="collisionAreaName" jdbcType="VARCHAR" />
+    <result column="collisionTime" property="collisionTime" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="DECIMAL" />
+    <result column="deviceId" property="deviceId" jdbcType="VARCHAR" />
+    <result column="deviceName" property="deviceName" jdbcType="VARCHAR" />
+    <result column="acCnt" property="acCnt" jdbcType="DECIMAL" />
+    <result column="salesArea" property="salesArea" jdbcType="DECIMAL" />
+  </resultMap>
+      
+  <!-- 窜货信息详细查询 -->
+  <select id="queryAcInfo" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+    SELECT
+          DISTINCT LABEL_ID as labelId,
+          PRODUCT_ID as productId,
+          (SELECT NAME FROM TBL_PRODUCT_${t.companyId} WHERE ID = ac.PRODUCT_ID) as productName,
+          (SELECT NAME FROM TBL_AREA WHERE ID = ac.SALES_AREA) as salesAreaName,
+          (SELECT NAME FROM TBL_AREA WHERE ID = ac.CONLLISION_AREA) as collisionAreaName,
+          date_format(CONLLISION_TIME,'%Y-%m-%d') as collisionTime,
+          DEVICE_ID as deviceId,
+          (case CONLLISION_TYPE 
+             when 0 then '消费者APP' 
+             else (SELECT OPERATOR FROM TBL_INSPECT_DEVICE_${t.companyId} WHERE DEVICE_ID = ac.DEVICE_ID) 
+          end) as deviceName
+      FROM TBL_AC_INFO_${t.companyId} ac
+     WHERE CONLLISION_AREA > 0
+       AND SALES_AREA > 0
+       AND PRODUCT_ID > 0
+       AND CONLLISION_TIME BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'  
+     ORDER BY collisionTime desc,productId,labelId
+   </select>
+   
+   <!-- 窜货统计 -->
+   <select id="queryAcCnt" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+    SELECT productId,productName,salesAreaName,count(labelId) as acCnt,salesArea
+      FROM(
+		  SELECT DISTINCT LABEL_ID as labelId,
+		         PRODUCT_ID as productId, 
+		         (SELECT NAME FROM TBL_PRODUCT_${t.companyId} WHERE ID = ac.PRODUCT_ID) as productName, 
+		         (SELECT NAME FROM TBL_AREA WHERE ID = ac.SALES_AREA) as salesAreaName,
+		         SALES_AREA as salesArea
+		    FROM TBL_AC_INFO_${t.companyId} ac 
+		   WHERE CONLLISION_AREA > 0 
+		     AND SALES_AREA > 0 
+		     AND PRODUCT_ID > 0 
+		     AND CONLLISION_TIME BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+		   ) a
+	 GROUP BY productId,productName,salesAreaName
+	 ORDER BY productId,acCnt DESC
+   </select>
+</mapper>

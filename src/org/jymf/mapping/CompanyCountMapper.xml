@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.CompanyCountMapper" >
+   
+  <resultMap id="BaseResultMap" type="org.jymf.entity.CompanyCount" >
+    <result column="product_id" property="productId" jdbcType="DECIMAL" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="Active_Cnt" property="activeCnt" jdbcType="DECIMAL" />
+    <result column="Package_Cnt" property="packageCnt" jdbcType="DECIMAL" />
+    <result column="Out_Cnt" property="outCnt" jdbcType="DECIMAL" />
+    <result column="In_Cnt" property="inCnt" jdbcType="DECIMAL" />
+    <result column="Sales_Cnt" property="salesCnt" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <!-- 基本信息统计 --> 
+  <select id="queryCompanyCount" parameterType="java.util.HashMap" resultMap="BaseResultMap" >
+    SELECT  
+          product_id,
+          product_name,
+          sum(Package_Cnt) as Package_Cnt, 
+          sum(Active_Cnt) as Active_Cnt,
+          sum(Out_Cnt) as Out_Cnt,
+          sum(In_Cnt) as In_Cnt,
+          sum(Sales_Cnt) as Sales_Cnt
+      FROM 
+	      (
+	          SELECT 
+		              product_id,
+		              product_name,
+		              Package_Cnt , 
+		              Active_Cnt,
+		              Out_Cnt,
+		              In_Cnt,
+		              Sales_Cnt,
+		              count_Date
+		         FROM tbl_count_${t.companyId} 
+		        WHERE count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59' 
+		     <if test="today != null and today == 1">
+		      union
+		      <include refid="sql" />
+		     </if>
+	      ) a
+      WHERE a.count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59' 
+        AND (   (a.Package_Cnt is not null AND a.Package_Cnt > 0)
+             OR (a.Active_Cnt  is not null AND a.Active_Cnt  > 0)
+             OR (a.Out_Cnt     is not null AND a.Out_Cnt     > 0)
+             OR (a.In_Cnt      is not null AND a.In_Cnt      > 0)
+             OR (a.Sales_Cnt   is not null AND a.Sales_Cnt   > 0)
+             )
+        <!-- AND product_id != 100  -->
+      GROUP by product_id,product_name
+      ORDER BY product_id
+  </select>
+  
+  <!-- 当前天统计 -->
+  <sql id="sql" >              
+       SELECT product.id as product_id,
+              product.name as product_name,
+              label.Package_Cnt , 
+              label.Active_Cnt,
+              opt.Out_Cnt,
+              opt.In_Cnt,
+              opt.Sales_Cnt,
+              date_format(now(),'%Y-%m-%d') as count_Date
+          FROM
+             tbl_product_${t.companyId} product 
+             LEFT JOIN 
+                 ( SELECT l.product_id ,
+                          sum(case when l.packstamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00') AND date_format(now(),'%Y-%m-%d 23:59:59') then 1 else 0 end) as Package_Cnt ,
+                          sum(case when l.timestamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00') AND date_format(now(),'%Y-%m-%d 23:59:59') then 1 else 0 end) as Active_Cnt
+                    FROM (SELECT l.product_id ,
+                                 l.packstamp,
+                                 l.CONS_TIME_FIRST,
+                                 l.timestamp
+                            FROM tbl_label_info_${t.companyId} l
+                           WHERE l.packstamp is not null
+                              OR l.CONS_TIME_FIRST is not null
+                              OR l.timestamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00')  AND date_format(now(),'%Y-%m-%d 23:59:59')
+                          ) l
+                    GROUP BY l.product_id 
+                 ) label
+                 on product.id = label.product_id 
+             LEFT JOIN 
+                 ( SELECT l.product_id,
+                          sum(case opt_action when 1 then 1 else 0 end) as Out_Cnt,
+                          sum(case opt_action when 2 then 1 else 0 end) as In_Cnt,
+                          sum(case opt_action when 3 then 1 else 0 end) as Sales_Cnt
+                     FROM tbl_opt_actions_${t.companyId} o,
+                          tbl_label_info_${t.companyId} l
+                    WHERE o.label_id = l.label_id
+                      AND o.opt_time BETWEEN date_format(now(),'%Y-%m-%d 00:00:00')  AND date_format(now(),'%Y-%m-%d 23:59:59')
+                    GROUP BY l.product_id
+                   ) opt
+                 ON product.id = opt.product_id
+    </sql>
+    
+    <select id="labelCompanyCount" parameterType="java.util.HashMap" resultMap="BaseResultMap" >
+    SELECT  
+          sum(Package_Cnt) as Package_Cnt, 
+          sum(Active_Cnt) as Active_Cnt,
+          sum(Out_Cnt) as Out_Cnt,
+          sum(In_Cnt) as In_Cnt,
+          sum(Sales_Cnt) as Sales_Cnt
+      FROM 
+	      (
+	          SELECT 
+		              Package_Cnt , 
+		              Active_Cnt,
+		              Out_Cnt,
+		              In_Cnt,
+		              Sales_Cnt,
+		              count_Date
+		         FROM tbl_count_${t.companyId} 
+		        WHERE count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59' 
+		     <if test="today != null and today == 1">
+		      union all
+		      <include refid="sqllabel" />
+		     </if>
+	      ) a
+      WHERE a.count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59' 
+        AND (   (a.Package_Cnt is not null AND a.Package_Cnt > 0)
+             OR (a.Active_Cnt  is not null AND a.Active_Cnt  > 0)
+             OR (a.Out_Cnt     is not null AND a.Out_Cnt     > 0)
+             OR (a.In_Cnt      is not null AND a.In_Cnt      > 0)
+             OR (a.Sales_Cnt   is not null AND a.Sales_Cnt   > 0)
+             )
+  </select>
+  
+  <!-- 当前天统计 -->
+  <sql id="sqllabel" >              
+       SELECT label.Package_Cnt , 
+              label.Active_Cnt,
+              opt.Out_Cnt,
+              opt.In_Cnt,
+              opt.Sales_Cnt,
+              date_format(now(),'%Y-%m-%d') as count_Date
+          FROM
+              ( SELECT sum(case when l.packstamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00') AND date_format(now(),'%Y-%m-%d 23:59:59') then 1 else 0 end) as Package_Cnt ,
+                       sum(case when l.timestamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00') AND date_format(now(),'%Y-%m-%d 23:59:59') then 1 else 0 end) as Active_Cnt
+                  FROM (SELECT   l.packstamp,
+                                 l.CONS_TIME_FIRST,
+                                 l.timestamp
+                            FROM tbl_label_info_${t.companyId} l
+                           WHERE l.packstamp is not null
+                              OR l.CONS_TIME_FIRST is not null
+                              OR l.timestamp BETWEEN date_format(now(),'%Y-%m-%d 00:00:00')  AND date_format(now(),'%Y-%m-%d 23:59:59')
+                          ) l
+               ) label,
+               ( SELECT sum(case opt_action when 1 then 1 else 0 end) as Out_Cnt,
+                        sum(case opt_action when 2 then 1 else 0 end) as In_Cnt,
+                        sum(case opt_action when 3 then 1 else 0 end) as Sales_Cnt
+                   FROM tbl_opt_actions_${t.companyId} o,
+                        tbl_label_info_${t.companyId} l
+                  WHERE o.label_id = l.label_id
+                    AND o.opt_time BETWEEN date_format(now(),'%Y-%m-%d 00:00:00')  AND date_format(now(),'%Y-%m-%d 23:59:59')
+               ) opt
+    </sql>
+    
+    <select id="labelCompanyCarMonitorCount" parameterType="java.util.HashMap" resultMap="BaseResultMap" >
+        SELECT
+          (    
+           SELECT COUNT(LABEL_ID)
+             FROM tbl_label_info_${t.companyId}
+             <if test="t.startDate != null and t.startDate != ''">
+		       WHERE  TIMESTAMP BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+		     </if>
+		   ) as Active_Cnt,
+		   ( 
+    	    SELECT 
+		    	  count(label.LABEL_ID) 
+			  FROM
+			      <!-- 取出指定时间段的标签(包标签) -->
+			      (SELECT LABEL_ID 
+			         FROM tbl_label_info_${t.companyId} 
+			        WHERE ISPACKAGE=1 AND PRODUCT_ID=100 
+			         <if test="t.startDate != null and t.startDate != ''">
+			          AND TIMESTAMP BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+		 	         </if>
+			      ) label,
+		          <!-- 取出所有含子标签的包标签ID -->
+				  (SELECT DISTINCT PACKAGE_ID
+				     FROM tbl_label_info_${t.companyId}
+			        WHERE ISPACKAGE=0 AND PRODUCT_ID !=100 AND PACKAGE_ID!=0 AND PACKAGE_ID is not NULL
+				  ) package,
+				  <!-- 取出每个标签最后一次操作 -->
+				  (SELECT MAX(ID) AS ID,LABEL_ID,OPT_ACTION
+				     FROM tbl_opt_actions_${t.companyId} 
+				    GROUP BY LABEL_ID
+				  ) opt 
+		     WHERE
+		           package.PACKAGE_ID = label.LABEL_ID
+		       AND label.LABEL_ID = opt.LABEL_ID
+		       AND opt.OPT_ACTION = 3
+		     ) AS Package_Cnt
+  </select>
+</mapper>

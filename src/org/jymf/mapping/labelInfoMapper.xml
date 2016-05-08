@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.LabelInfoMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.LabelInfo" >
+    <result column="label_id" property="labelId" jdbcType="DECIMAL" />
+    <result column="product_Id" property="productId" jdbcType="DECIMAL" />
+    <result column="ispackage" property="isPackage" jdbcType="INTEGER" />
+    <result column="isproduct" property="isProduct" jdbcType="INTEGER" />
+    <result column="package_Id" property="packageId" jdbcType="DECIMAL" />
+    <result column="sales_area" property="salesArea" jdbcType="DECIMAL" />
+    <result column="produce_Date" property="produceDate" jdbcType="VARCHAR"/>
+    <result column="batch_number" property="batchNumber" jdbcType="DECIMAL" />
+    <result column="origin_addr" property="originAddr" jdbcType="VARCHAR"/>
+    <result column="query_count" property="queryCount" jdbcType="DECIMAL" />
+    <result column="cons_count" property="consCount" jdbcType="DECIMAL" />
+    <result column="query_time_first" property="queryTimeFirst" jdbcType="VARCHAR"/>
+    <result column="cons_time_first" property="consTimeFirst" jdbcType="VARCHAR"/>
+    <result column="cons_addr_first" property="consAddrFirst" jdbcType="DECIMAL"/>
+    <result column="status" property="status" jdbcType="INTEGER" />
+	<result column="timestamp" property="timestamp" jdbcType="VARCHAR"/>
+	<result column="packstamp" property="packStamp" jdbcType="VARCHAR"/>
+    <result column="terminaltype" property="terminalType" jdbcType="DECIMAL"/>
+    <result column="good_id" property="goodId" jdbcType="DECIMAL"/>
+  </resultMap>
+      
+  <select id="findByCondition" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select * from tbl_label_info_${companyId}
+  	<where>
+  		1=1
+  		<if test="goodId != null">
+  		and good_id = #{goodId,jdbcType=DECIMAL}	
+  		</if>
+  	</where>
+  </select>
+  
+  <select id="countActiveLabel" parameterType="java.util.Map" resultType="java.math.BigDecimal">
+    SELECT count(ID) as cnt 
+      FROM tbl_label_info_${t.companyId}
+     WHERE label_id BETWEEN #{t.startId,jdbcType=DECIMAL} AND #{t.endId,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 汽配模式包子关系绑定 -->
+  <update id="updateCarPackageLabel" parameterType="java.math.BigDecimal">
+	 UPDATE  tbl_label_info_#{companyId,jdbcType=DECIMAL} a,
+	       (SELECT label_id,package_id,carno
+	          FROM tbl_label_info_#{companyId,jdbcType=DECIMAL} 
+	         WHERE product_id=100 
+	           AND ispackage=1
+	           AND carno IS NOT NULL
+	           AND DATE_FORMAT(TIMESTAMP,'%Y-%m-%d')=DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'%Y-%m-%d')
+	        )b  
+	 SET a.package_id =b.package_id,
+	     a.packstamp=CURRENT_TIMESTAMP
+	 WHERE (a.package_id=0 OR a.package_id IS NULL)
+	   AND b.carno = a.carno
+	   AND (a.product_id!=100 OR a.product_id IS NULL)
+   </update>
+</mapper>

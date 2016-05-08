@@ -1,0 +1,14 @@
+package org.jymf.service.impl;
+
+import org.jymf.service.DatabaseSynchronize;
+import org.springframework.stereotype.Service;
+@Service
+public class DatabaseSynchronizeImpl implements DatabaseSynchronize {
+	
+	@Override
+	public boolean dbSynchronize() {
+		
+		return false;
+	}
+
+}

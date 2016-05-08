@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.ProductTypeMapper">
+  <resultMap id="BaseResultMap" type="org.jymf.entity.ProductType">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="PARENTID" jdbcType="DECIMAL" property="parentId"/>
+    <result column="NAME" jdbcType="VARCHAR" property="typeName" />
+  </resultMap>
+  
+	<!-- 根据typePid查询该父元素所有子元素产品类型 -->
+	<select id="query" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+		SELECT  id,
+			   	parentid,
+			   	name 
+		  FROM  tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+		 WHERE  PARENTID=#{typePid,jdbcType=DECIMAL} 
+	  ORDER BY  id DESC
+	</select>
+	
+	<!-- 查询指定公司下所有产品类型-->
+	<select id="findAll" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+		SELECT 	id,
+				parentid,
+				name 
+		  FROM 	tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+	</select>
+	
+	<!-- 查询指定公司下某ID的类型名-->
+	<select id="findTypeById" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+		SELECT 	id,
+				parentid,
+				name 
+		  FROM 	tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+		 WHERE 	id = #{t.id,jdbcType=DECIMAL} 
+	</select>
+	
+	<!-- 查询指定公司下全部的类型名-->
+	<select id="findTypeByName" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+		SELECT 	id,
+				parentid,
+				name 
+		  FROM 	tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+		 WHERE 	name = #{t.typeName,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 新增产品类型 -->
+	<insert id="insert" parameterType="java.util.HashMap" >
+		INSERT INTO tbl_product_type_#{companyId,jdbcType=DECIMAL} (
+				PARENTID,
+				NAME
+				)
+		VALUES (
+				#{t.parentId,jdbcType=DECIMAL}, 
+				#{t.typeName,jdbcType=VARCHAR} 
+				)
+	</insert>
+	
+	<!-- 更新产品类型信息 -->
+	<update id="update" parameterType="java.util.HashMap">
+		UPDATE tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+		   SET name = #{t.typeName,jdbcType=VARCHAR} 
+		 WHERE id = #{t.id,jdbcType=DECIMAL}
+	</update>
+	
+	<!-- 查询某类型（id）下的子类型个数 -->
+	<select id="getChildCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT COUNT(id) 
+		  FROM tbl_product_type_#{companyId,jdbcType=DECIMAL} 
+		 WHERE parentid = #{typePid,jdbcType=DECIMAL}
+	</select>
+	
+</mapper>

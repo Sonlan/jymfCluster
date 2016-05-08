@@ -1,0 +1,60 @@
+{
+    "mode":"3",
+    "title":"云南汽配追溯模式",
+    "menus": [
+        {
+            "id": "company-welcome",
+            "title":"首页",
+            "link": "/company/main/",
+            "authority": "0"
+        },
+        {
+            "id": "company-update",
+            "title":"企业信息",
+            "link": "/company/update/",
+            "css": "img_deploy_company",
+            "authority": "0"
+        },
+        {
+            "id": "company-product",
+            "title":"产品类型",
+            "link": "/company/product/main/",
+            "css":"img_deploy_product",
+            "authority": "0"
+        },
+        {
+            "id": "company-salescnt",
+            "title":"销售统计",
+            "link": "/company/count/salescnt/",
+            "css":"img_deploy_sales_cnt",
+            "authority": "0"
+        },
+        {
+            "id": "company-equipment",
+            "title":"设备管理",
+            "link": "/company/equipment/main/",
+            "css":"img_home_equipment",
+            "authority": "0"
+        },
+        {
+            "id": "company-document",
+            "title":"维修合同",
+            "link": "/company/document/main/",
+            "css":"img_deploy_document",
+            "authority": "0"
+        },
+        {
+            "id": "company-user",
+            "title":"用户配置",
+            "link": "/company/user/main/",
+            "css":"img_deploy_user",
+            "authority": "1"
+        },
+        {
+            "id": "company-pwd",
+            "title":"修改密码",
+            "link": "/company/updpwd/",
+            "authority": "0"
+        }
+    ]
+}

@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.ProductMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Product" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TYPE" property="type" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="PRODUCER" property="producer" jdbcType="VARCHAR" />
+    <result column="ORIGIN" property="origin" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="BOX_CNT" property="boxCnt" jdbcType="DECIMAL" />
+    <result column="PALLET_CNT" property="palletCnt" jdbcType="DECIMAL" />
+    <result column="MAX_COUNT_QUEYR" property="maxCountQueyr" jdbcType="DECIMAL" />
+    <result column="MAX_COUNT_CONSQUERY" property="maxCountConsquery" jdbcType="DECIMAL" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="VARCHAR" />
+    <result column="update_DATE" property="updateDate" jdbcType="VARCHAR" />
+    <result column="LABEL_CNT" property="labelCnt" jdbcType="DECIMAL" />
+    <result column="consNum" property="consNum" jdbcType="DECIMAL" />
+    <result column="number_id" property="numberId" jdbcType="VARCHAR" />
+    <result column="cartype" property="cartype" jdbcType="VARCHAR" />
+    <result column="QUERY_DES" property="queryDes" jdbcType="VARCHAR" />
+    <result column="AUDIT_USER" property="auditUser" jdbcType="VARCHAR" />
+    <result column="AUDIT_DATE" property="auditDate" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="CONSUMETYPE" property="consumeType" jdbcType="DECIMAL" />
+    <result column="supplier" property="supplier" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, 
+    TYPE, 
+    NAME, 
+    number_id,
+    cartype,
+    REPLACE(DESCRIPTION,'#%*',CONCAT(ASCII(13),ASCII(10))) AS DESCRIPTION, 
+    PRODUCER, 
+    ORIGIN, 
+    URL, 
+    BOX_CNT,
+    PALLET_CNT,
+    MAX_COUNT_QUEYR, 
+    MAX_COUNT_CONSQUERY,
+    QUERY_DES,
+    AUDIT_USER,
+    AUDIT_DATE,
+    STATUS,
+    CONSUMETYPE,
+    supplier
+  </sql>
+  
+<!-- resultType="BaseResultMap" 每返回一条结果封装到BaseResultMap(列表)里-->  
+<!-- cqs 2014/05/13 add-->
+    <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+    SELECT
+           product.ID,
+           product.NAME,
+           product.number_id,
+           product.CARTYPE,
+           product.DESCRIPTION,
+           product.producer,
+           product.origin,
+           product.CREATE_DATE,
+           product.UPDATE_DATE,
+           product.AUDIT_USER,
+           product.STATUS,
+           label.LABEL_CNT,
+           label.consNum
+      FROM
+           (SELECT
+                ID,
+                name,
+                number_Id,
+                cartype,
+                REPLACE(description,'#%*',CONCAT(ASCII(13),ASCII(10))) AS DESCRIPTION,
+                producer,
+                origin,
+                AUDIT_USER,
+                STATUS,
+                CREATE_DATE,
+                UPDATE_DATE
+            FROM TBL_PRODUCT_${t.companyId} 
+            <where>
+                1=1
+                <if test="t.name != null and t.name != ''">
+                AND REPLACE(CONCAT_WS(' ',name,number_Id),' ','') like '%${t.name}%'
+                </if>
+                <if test="t.id != null and t.id != 0">
+                AND ID = #{t.id,jdbcType=DECIMAL}
+                </if>
+                AND ID != 100
+            </where>
+            ) product 
+         <if test="workMode != null and workMode == 3">
+         left join 
+           ( SELECT  A.PRODUCT_ID,A.LABEL_CNT,IFNULL(B.consNum,0) as consNum
+              FROM
+                 (
+                    (SELECT PRODUCT_ID,
+                            COUNT(LABEL_ID) as LABEL_CNT
+                       FROM TBL_LABEL_INFO_${t.companyId} 
+                      WHERE PACKAGE_ID!=0 AND PACKAGE_ID IS NOT NULL 
+                      GROUP BY PRODUCT_ID) A 
+                   LEFT JOIN 
+                    (SELECT PRODUCT_ID,
+                            COUNT(LABEL_ID) as consNum
+                       FROM TBL_LABEL_INFO_${t.companyId} 
+                      WHERE CONS_TIME_FIRST IS NOT NULL
+                      GROUP BY PRODUCT_ID) B
+                   ON A.PRODUCT_ID = B.PRODUCT_ID
+                  )
+            ) label
+          ON product.ID=label.PRODUCT_ID
+         </if>
+         <if test="workMode != null and workMode != 3">
+         left join 
+           ( SELECT product_id,
+                    SUM(IFNULL(Active_Cnt,0)) as LABEL_CNT,
+                    SUM(IFNULL(Query_cnt,0)) as consNum
+               FROM TBL_COUNT_${t.companyId} 
+              GROUP BY PRODUCT_ID 
+            ) label
+            ON product.ID=label.PRODUCT_ID
+         </if>
+      <!-- ORDER BY label.LABEL_CNT DESC,label.consNum DESC,product.ID DESC  -->
+         ORDER BY ${t.orderBy} product.ID DESC
+    </select>
+    
+    <!-- 获取最大可用的ID -->
+    <select id="selectMaxId" resultType="java.math.BigDecimal"  parameterType="java.util.HashMap">
+    <![CDATA[
+        SELECT (
+                 CASE WHEN ((IFNULL(Max(ID),0) + 1)<100000) THEN 100001 
+                 ELSE Max(ID) + 1 END
+                ) AS ID  
+          FROM TBL_PRODUCT_${companyId}
+    ]]>
+    </select>
+  
+  <!-- 获取所有ID -->
+  <select id="selectAllId" resultType="java.math.BigDecimal"  parameterType="java.util.HashMap">
+        SELECT ID  
+          FROM TBL_PRODUCT_${companyId}
+         WHERE ID != 100
+         ORDER BY ID
+  </select>
+    
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from TBL_PRODUCT_${companyId}
+    where ID = #{id,jdbcType=DECIMAL}
+      AND ID != 100
+  </select>
+  
+  <!-- 商户单选画面 -->
+  <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    SELECT *
+      FROM TBL_PRODUCT_${t.companyId} product
+     <where>
+           product.ID != 100
+           <if test="t.name != null and t.name != ''">
+           AND  product.NAME like '%${t.name}%'
+           </if>
+           <if test="t.id != null and t.id != 0">
+           AND  product.ID = #{t.id,jdbcType=DECIMAL}
+           </if> 
+     </where>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.util.HashMap" >
+    delete from TBL_PRODUCT_${companyId}
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="org.jymf.entity.Product" >
+    insert into TBL_PRODUCT_${companyId}
+    (
+      ID, 
+      TYPE, 
+      NAME,
+      number_Id,
+      cartype, 
+      DESCRIPTION, 
+      PRODUCER, 
+      ORIGIN, 
+      URL, 
+      BOX_CNT,
+      PALLET_CNT,
+      MAX_COUNT_QUEYR, 
+      MAX_COUNT_CONSQUERY,
+      QUERY_DES,
+      AUDIT_USER,
+      AUDIT_DATE,
+      STATUS,
+      CONSUMETYPE,
+      supplier
+    )
+    values 
+    (
+      #{id,jdbcType=DECIMAL}, 
+      #{type,jdbcType=DECIMAL}, 
+      #{name,jdbcType=VARCHAR}, 
+      #{numberId,jdbcType=VARCHAR}, 
+      #{cartype,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, 
+      #{producer,jdbcType=VARCHAR}, 
+      #{origin,jdbcType=VARCHAR}, 
+      #{url,jdbcType=VARCHAR}, 
+      #{boxCnt,jdbcType=DECIMAL}, 
+      #{palletCnt,jdbcType=DECIMAL}, 
+      #{maxCountQueyr,jdbcType=DECIMAL}, 
+      #{maxCountConsquery,jdbcType=DECIMAL},
+      #{queryDes,jdbcType=VARCHAR},
+      #{auditUser,jdbcType=VARCHAR},
+      <if test="auditUser != null" >
+       NOW(),
+      </if>
+      <if test="auditUser == null" >
+       null,
+      </if>
+      #{status,jdbcType=DECIMAL},
+      #{consumeType,jdbcType=DECIMAL},
+      #{supplier,jdbcType=VARCHAR}
+    )
+  </insert>
+  <insert id="insertSelective" parameterType="org.jymf.entity.Product" >
+    insert into TBL_PRODUCT_${companyId}
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="numberId != null" >
+        Number_Id,
+      </if>
+      <if test="cartype != null" >
+        cartype,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="producer != null" >
+        PRODUCER,
+      </if>
+      <if test="origin != null" >
+        ORIGIN,
+      </if>
+      <if test="url != null" >
+        URL,
+      </if>
+      <if test="boxCnt != null" >
+        BOX_CNT,
+      </if>
+      <if test="palletCnt != null" >
+        PALLET_CNT,
+      </if>
+      <if test="maxCountQueyr != null" >
+        MAX_COUNT_QUEYR,
+      </if>
+      <if test="maxCountConsquery != null" >
+        MAX_COUNT_CONSQUERY,
+      </if>
+      <if test="queryDes != null" >
+        QUERY_DES,
+      </if>
+      <if test="auditUser != null" >
+        AUDIT_USER,
+        AUDIT_DATE,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>   
+      <if test="supplier != null" >
+        supplier,
+      </if>   
+       <if test="consumeType != null" >
+        consumeType,
+      </if>   
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="numberId != null" >
+        #{numberId,jdbcType=VARCHAR},
+      </if>
+      <if test="cartype != null" >
+        #{cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="producer != null" >
+        #{producer,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null" >
+        #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="boxCnt != null" >
+        #{boxCnt,jdbcType=DECIMAL},
+      </if>
+      <if test="palletCnt != null" >
+        #{palletCnt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxCountQueyr != null" >
+        #{maxCountQueyr,jdbcType=DECIMAL},
+      </if>
+      <if test="maxCountConsquery != null" >
+        #{maxCountConsquery,jdbcType=DECIMAL},
+      </if>
+      <if test="queryDes != null" >
+        #{queryDes,jdbcType=VARCHAR},
+      </if>
+       <if test="auditUser != null" >
+        #{auditUser,jdbcType=VARCHAR},
+        NOW(),
+      </if>
+       <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="supplier != null" >
+        #{supplier,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeType != null" >
+        #{consumeType,jdbcType=DECIMAL},
+      </if> 
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.Product" >
+    update TBL_PRODUCT_${companyId}
+    <set >
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+       <if test="numberId != null" >
+        NUMBER_ID = #{numberId,jdbcType=VARCHAR},
+      </if>
+      <if test="cartype != null" >
+        CARTYPE = #{cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="producer != null" >
+        PRODUCER = #{producer,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null" >
+        ORIGIN = #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        URL = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="boxCnt != null" >
+        BOX_CNT = #{boxCnt,jdbcType=DECIMAL},
+      </if>
+      <if test="palletCnt != null" >
+        PALLET_CNT = #{palletCnt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxCountQueyr != null" >
+        MAX_COUNT_QUEYR = #{maxCountQueyr,jdbcType=DECIMAL},
+      </if>
+      <if test="maxCountConsquery != null" >
+        MAX_COUNT_CONSQUERY = #{maxCountConsquery,jdbcType=DECIMAL},
+      </if>
+      <if test="queryDes != null" >
+        QUERY_DES = #{queryDes,jdbcType=VARCHAR},
+      </if>
+      <if test="auditUser != null" >
+        AUDIT_USER = #{auditUser,jdbcType=VARCHAR},
+        AUDIT_DATE = NOW(),
+        STATUS =1,
+      </if>   
+      <if test="consumeType != null" >
+        CONSUMETYPE = #{consumeType,jdbcType=DECIMAL},
+      </if>
+      <if test="supplier != null" >
+        supplier = #{supplier,jdbcType=VARCHAR},
+      </if>
+      UPDATE_DATE=NOW()
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.Product" >
+    update TBL_PRODUCT_${companyId}
+       set TYPE = #{type,jdbcType=DECIMAL},
+           NAME = #{name,jdbcType=VARCHAR},
+           NUMBER_ID = #{numberId,jdbcType=VARCHAR},
+           CARTYPE = #{cartype,jdbcType=VARCHAR},
+           DESCRIPTION = #{description,jdbcType=VARCHAR},
+           PRODUCER = #{producer,jdbcType=VARCHAR},
+           ORIGIN = #{origin,jdbcType=VARCHAR},
+           URL = #{url,jdbcType=VARCHAR},
+           BOX_CNT = #{boxCnt,jdbcType=DECIMAL},
+           PALLET_CNT = #{palletCnt,jdbcType=DECIMAL},
+           MAX_COUNT_QUEYR = #{maxCountQueyr,jdbcType=DECIMAL},
+           MAX_COUNT_CONSQUERY = #{maxCountConsquery,jdbcType=DECIMAL},
+           UPDATE_DATE=NOW(),
+           QUERY_DES=#{queryDes,jdbcType=VARCHAR},
+           supplier=#{supplier,jdbcType=VARCHAR},
+           CONSUMETYPE = #{consumeType,jdbcType=DECIMAL},
+           <if test="auditUser != null" >
+               AUDIT_USER = #{auditUser,jdbcType=VARCHAR},
+               AUDIT_DATE = NOW(),
+               STATUS = 1
+           </if>
+     where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 查询全部产品 用于导出数据 update by wfj -->
+  <select id="findAllProduct" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" /> 
+    FROM TBL_PRODUCT_#{companyId,jdbcType=DECIMAL}
+    WHERE ID>=100001
+  </select>
+  
+  <!-- cqs 2015/09/10 add 汽配销售统计查询-->
+    <select id="querySales" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+    SELECT
+           product.ID,
+           product.NAME,
+           product.number_id,
+           product.CARTYPE,
+           product.producer,
+           product.origin,
+           label.LABEL_CNT,
+           label.consNum
+      FROM
+           (SELECT
+                   ID,
+                   name,
+                   number_Id,
+                   cartype,
+                   producer,
+                   origin
+              FROM TBL_PRODUCT_${t.companyId} 
+             WHERE
+                   1=1
+                   <if test="t.name != null and t.name != ''">
+                   AND REPLACE(CONCAT_WS(' ',name,number_Id),' ','') like '%${t.name}%'
+                   </if>
+                   AND ID != 100
+            ) product 
+           ,(SELECT  A.PRODUCT_ID,A.LABEL_CNT,IFNULL(B.consNum,0) as consNum
+              FROM
+                 (
+                    (SELECT PRODUCT_ID,
+                            COUNT(LABEL_ID) as LABEL_CNT
+                       FROM TBL_LABEL_INFO_${t.companyId} 
+                      WHERE PACKAGE_ID!=0 AND PACKAGE_ID IS NOT NULL 
+                      GROUP BY PRODUCT_ID) A 
+                   LEFT JOIN 
+                    (SELECT PRODUCT_ID,
+                            COUNT(LABEL_ID) as consNum
+                       FROM TBL_LABEL_INFO_${t.companyId} 
+                      WHERE CONS_TIME_FIRST IS NOT NULL
+                      GROUP BY PRODUCT_ID) B
+                   ON A.PRODUCT_ID = B.PRODUCT_ID
+                  )
+             ) label
+     WHERE product.ID=label.PRODUCT_ID
+     ORDER BY label.LABEL_CNT DESC,product.ID ASC
+    </select>
+</mapper>

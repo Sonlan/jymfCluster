@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.CompanyMonitorMapper">
+	<resultMap id="BaseResultMap" type="org.jymf.entity.CompanyMonitor">
+		<id column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="PWD" jdbcType="VARCHAR" property="pwd" />
+		<result column="TEL" jdbcType="VARCHAR" property="tel" />
+		<result column="STATUS" jdbcType="DECIMAL" property="status" />
+		<result column="ACCOUNT" jdbcType="VARCHAR" property="account" />
+		<result column="MONITOR_MODE" jdbcType="DECIMAL" property="monitorMode" />
+		<result column="PRO_TYPE" jdbcType="DECIMAL" property="proType" />
+		<result column="updateTime" jdbcType="VARCHAR" property="updateTime" />
+		<result column="areaCode" jdbcType="VARCHAR" property="areaCode" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, NAME, TEL, STATUS, ACCOUNT, PWD, MONITOR_MODE,PRO_TYPE,createTime,areaCode
+	</sql>
+	
+	<!-- 通过用户名检索 -->
+	<select id="selectByCompanyMonitor" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT  
+		<include refid="Base_Column_List" />
+   		from TBL_COMPANY_MONITOR where ACCOUNT = #{account,jdbcType=VARCHAR}
+	</select>
+	
+		<!-- 通过用户名密码进行检索 -->
+  <select id="selectByAccountAndPassword" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TBL_COMPANY_MONITOR
+    where ACCOUNT = #{account,jdbcType=VARCHAR}
+      and PWD = #{pwd,jdbcType=VARCHAR}
+  </select>
+	
+	<!--resultType="BaseResultMap" 每返回一条结果封装到BaseResultMap(监管部门列表)里 -->
+	<!-- cqs 2014/05/09 add -->
+	<select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM TBL_COMPANY_MONITOR
+		<where>
+		    1=1
+			<if test="t.name != null and t.name != ''">
+			AND NAME like '%${t.name}%'
+			</if>
+			<if test="t.id != null and t.id != 0">
+			AND ID = #{t.id,jdbcType=DECIMAL}
+			</if>
+		</where>
+		ORDER BY ID DESC
+	</select>
+
+	<select id="companyIdquery" parameterType="java.math.BigDecimal"
+		resultType="java.math.BigDecimal">
+		select company_id
+		from TBL_COMPANY_MONITOR_RELATION
+		where monitor_id = #{monitorId,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="regionquery" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM TBL_COMPANY_MONITOR
+		<where>
+		    1=1
+			<if test="t.areaCode != null and t.areaCode != ''">
+			AND areaCode like '%${t.areaCode}%'
+			</if>
+			<if test="t.proType != null and t.proType != ''">
+			<![CDATA[ AND PRO_TYPE = (${t.proType}+1) ]]>
+			</if>
+		</where>
+		ORDER BY ID DESC
+	</select>
+	
+	<select id="findMaxId" resultType="java.lang.Integer">
+		SELECT MAX(ID)  FROM TBL_COMPANY_MONITOR
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.math.BigDecimal"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from TBL_COMPANY_MONITOR
+		where ID = #{id,jdbcType=DECIMAL}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal">
+		delete from TBL_COMPANY_MONITOR
+		where ID = #{id,jdbcType=DECIMAL}
+	</delete>
+	<insert id="insert" parameterType="org.jymf.entity.CompanyMonitor">
+		insert into TBL_COMPANY_MONITOR 
+		(ID, NAME, PWD,	TEL, createTime,STATUS, ACCOUNT,monitor_mode,PRO_TYPE,areaCode)
+		values 
+		(#{id,jdbcType=DECIMAL},
+		#{name,jdbcType=VARCHAR},
+		#{pwd,jdbcType=VARCHAR},
+		#{tel,jdbcType=VARCHAR}, now(),
+		#{status,jdbcType=DECIMAL}, 
+		#{account,jdbcType=VARCHAR},
+		#{monitorMode,jdbcType=DECIMAL},
+		#{proType,jdbcType=DECIMAL},
+		#{areaCode,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="org.jymf.entity.CompanyMonitor">
+		insert into TBL_COMPANY_MONITOR
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="pwd != null">
+				PWD,
+			</if>
+			<if test="tel != null">
+				TEL,
+			</if>
+			createTime,
+			<if test="status != null">
+				STATUS,
+			</if>
+			<if test="account != null">
+				ACCOUNT,
+			</if>
+			<if test="monitorMode != null">
+				monitor_mode,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=DECIMAL},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="pwd != null">
+				#{pwd,jdbcType=VARCHAR},
+			</if>
+			<if test="tel != null">
+				#{tel,jdbcType=VARCHAR},
+			</if>
+			sysdate,
+			<if test="status != null">
+				#{status,jdbcType=DECIMAL},
+			</if>
+			<if test="account != null">
+				#{account,jdbcType=VARCHAR},
+			</if>
+			<if test="monitorMode != null">
+				#{monitorMode,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.CompanyMonitor">
+		update TBL_COMPANY_MONITOR
+		<set>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="pwd != null">
+				PWD = #{pwd,jdbcType=VARCHAR},
+			</if>
+			<if test="tel != null">
+				TEL = #{tel,jdbcType=VARCHAR},
+			</if>
+			    updateTime = now(),
+			<if test="status != null">
+				STATUS = #{status,jdbcType=DECIMAL},
+			</if>
+			<if test="account != null">
+				ACCOUNT = #{account,jdbcType=VARCHAR},
+			</if>
+			<if test="monitorMode != null">
+				monitor_mode = #{monitorMode,jdbcType=DECIMAL},
+			</if>
+			<if test="proType != null">
+				PRO_TYPE = #{proType,jdbcType=DECIMAL},
+			</if>
+			<if test="areaCode != null">
+				areaCode = #{areaCode,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="org.jymf.entity.CompanyMonitor">
+		update TBL_COMPANY_MONITOR
+		set NAME = #{name,jdbcType=VARCHAR},
+		PWD = #{pwd,jdbcType=VARCHAR},
+		TEL = #{tel,jdbcType=VARCHAR},
+		UPDATE_TIME = now(),
+		STATUS = #{status,jdbcType=DECIMAL},
+		monitor_mode = #{monitorMode,jdbcType=DECIMAL},
+		ACCOUNT = #{account,jdbcType=VARCHAR} 
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+</mapper>

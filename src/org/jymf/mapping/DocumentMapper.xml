@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.DocumentMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Document" >
+    <id column="PACKAGE_ID" property="id" jdbcType="BIGINT" />
+    <result column="COUNT" property="count" jdbcType="BIGINT" />
+    <result column="TIMESTAMP" property="createDate" jdbcType="VARCHAR" />
+    <result column="OPT_CARNO" property="carNo" jdbcType="VARCHAR" />
+    <result column="TEL" property="tel" jdbcType="VARCHAR" />
+    <result column="CONS_TIME_FIRST" property="consTime" jdbcType="VARCHAR" />
+    <result column="NAME" property="consArea" jdbcType="VARCHAR" />
+  </resultMap>
+    
+  <resultMap id="DetailtMap" type="org.jymf.entity.DocumentDetail" >
+    <id column="LABEL_ID" property="id" jdbcType="BIGINT" />
+    <result column="NAME" property="productName" jdbcType="VARCHAR" />
+    <result column="CARTYPE" property="carType" jdbcType="VARCHAR" />
+    <result column="PRODUCER" property="producer" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    SELECT 
+    	   package.PACKAGE_ID,
+    	   COUNT(package.LABEL_ID) as COUNT,
+    	   DATE_FORMAT(label.TIMESTAMP,'%Y-%m-%d %H:%i:%S') as TIMESTAMP,
+    	   DATE_FORMAT(label.CONS_TIME_FIRST,'%Y-%m-%d %H:%i:%S') as CONS_TIME_FIRST,
+    	   label.NAME,
+    	   opt.OPT_CARNO,
+    	   label.TEL as TEL
+	  FROM
+		   <!-- 取出指定时间段的标签(包标签) -->
+		   (SELECT LABEL_ID,TIMESTAMP,CONS_TIME_FIRST,NAME,TEL
+		      FROM tbl_label_info_${t.companyId}
+		      LEFT JOIN TBL_AREA
+		        ON CONS_ADDR_FIRST = id
+		     WHERE ISPACKAGE=1 AND PRODUCT_ID=100 
+		       <if test="t.startDate != null and t.startDate != ''">
+		           AND TIMESTAMP BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+		       </if>
+		   ) label,
+  		   <!-- 取出所有含子标签的包标签ID -->
+		   (SELECT DISTINCT PACKAGE_ID
+				     FROM tbl_label_info_${t.companyId}
+			        WHERE ISPACKAGE=0 AND PRODUCT_ID !=100 AND PACKAGE_ID!=0 AND PACKAGE_ID is not NULL
+			) package,
+
+		   (SELECT MAX(ID) AS ID,LABEL_ID,OPT_CARNO,OPT_ACTION
+		      FROM tbl_opt_actions_${t.companyId} 
+		     GROUP BY LABEL_ID
+		   ) opt 
+     WHERE
+           label.LABEL_ID = package.PACKAGE_ID
+       AND package.PACKAGE_ID = opt.LABEL_ID
+       AND opt.OPT_ACTION = 3
+     GROUP by PACKAGE_ID
+	 ORDER BY label.TIMESTAMP DESC
+  </select>
+
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    SELECT 
+           package.LABEL_ID as PACKAGE_ID,
+           COUNT(label.LABEL_ID) as COUNT,
+           DATE_FORMAT(package.TIMESTAMP,'%Y-%m-%d %H:%i:%S') as TIMESTAMP,
+           DATE_FORMAT(package.CONS_TIME_FIRST,'%Y-%m-%d %H:%i:%S') as CONS_TIME_FIRST,
+           package.NAME,
+           opt.OPT_CARNO,
+           package.TEL as TEL
+      FROM
+           (SELECT LABEL_ID,TIMESTAMP,CONS_TIME_FIRST,NAME,TEL
+              FROM tbl_label_info_${t.companyId}
+              LEFT JOIN TBL_AREA
+                ON CONS_ADDR_FIRST = id
+             WHERE ISPACKAGE=1 
+               AND LABEL_ID = #{t.id,jdbcType=DECIMAL}
+           ) package,
+           tbl_label_info_${t.companyId} label,
+           (SELECT MAX(ID) AS ID,LABEL_ID,OPT_CARNO,OPT_ACTION
+              FROM tbl_opt_actions_${t.companyId} 
+             WHERE LABEL_ID = #{t.id,jdbcType=DECIMAL}
+           ) opt
+     WHERE
+           package.LABEL_ID = label.PACKAGE_ID
+       AND label.PACKAGE_ID = opt.LABEL_ID
+       AND opt.OPT_ACTION = 3
+  </select>
+  
+  <select id="selectDetail" resultMap="DetailtMap" parameterType="java.util.HashMap" >
+    SELECT 
+           label.LABEL_ID,
+           CONCAT(product.name,' ',product.number_Id) as NAME,
+           product.CARTYPE,
+           product.PRODUCER
+      FROM 
+           (SELECT label.PRODUCT_ID,
+                   label.LABEL_ID
+             FROM  tbl_label_info_${t.companyId} label,
+		           (SELECT MAX(ID) AS ID,LABEL_ID,OPT_CARNO,OPT_ACTION
+		              FROM tbl_opt_actions_${t.companyId} 
+		             WHERE label_id = #{t.id,jdbcType=DECIMAL}
+		            ) opt
+		     WHERE label.PACKAGE_ID = #{t.id,jdbcType=DECIMAL}
+               AND label.PACKAGE_ID = opt.LABEL_ID
+               AND opt.OPT_ACTION = 3
+            ) label
+      LEFT JOIN tbl_product_${t.companyId} product
+        ON label.PRODUCT_ID = product.ID
+     ORDER BY product.id DESC
+  </select>
+  
+</mapper>

@@ -1,0 +1,206 @@
+ body
+{
+	margin:0;
+	padding:0;
+	padding-bottom:20px;
+	font-family:"songti";
+	font-size:12px;
+}
+#div_main{
+	margin-left: 3%;
+	margin-right: 3%;
+	*zoom: 1;
+	min-height:
+}
+
+
+/*页面head样式*/
+.top {
+	background-image: url(../images/main_2.png);
+	background-repeat: repeat-x;
+	width:99.9%;
+	height: 49px;
+}
+/*页面head样式*/
+.top_left {
+	background-image: url(../images/main_1.png);
+	width: 210px;
+	height: 42px;
+}
+
+.top_ynqp_left {
+	background-image: url(../images/head_ynqp_1.png);
+	background-repeat:no-repeat;
+	width: 410px;
+	height: 42px;
+}
+
+/*导航栏外观*/
+.top_one {
+	border: 1px solid #000099;
+	background-image: url(../images/lt.png);
+	background-repeat: repeat-x;
+	width: 99.9%;
+	height: 37px;
+}
+
+
+/*导航样式*/
+.top_div a {
+	color: #FFFFFF;
+	float: left;
+	margin-left: 10px;
+	font-size: 13px;
+	line-height: 37px;
+	width: 100px;
+	text-align: center;
+	text-decoration: none
+}
+
+/*导航鼠标经过属性*/
+.top_div a:hover {
+	background-color:#1C86EE; 
+	 color:white;
+	 border:0px solid; 
+	 margin-top:0px;
+	 font-size: 14px;
+ 	 font-weight: bold;
+}
+
+.top_div a:hover,.top_div .active {
+	background-color:#1C86EE;
+	color: white;
+	border: 0px solid;
+	margin-top: 0px;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+/*导航栏默认选中样式*/
+ .top_div a.cs{
+	 background-color:#1C86EE; 
+	 color:white;
+	 border:0px solid; 
+	 margin-top:0px;
+	 font-size: 14px;
+ 	 font-weight: bold;
+ }
+ 
+ /* 修改密码链接 */
+ .div_pwd
+{
+	float:right;
+	width:80px;
+	font-size: 13px;
+	padding:25px;
+	text-align:center;
+	text-decoration: none;
+}
+
+
+
+
+
+
+/*企业用户导航栏样式*/
+img{vertical-align:middle;}
+em{font-style:normal;}
+a img, :link img, :visited img{border:0;}
+a:link, a:visited{text-decoration:none;}
+a:hover,a:focus{text-decoration:underline;color:#0573bd;text-decoration:none;}
+ul, ul li{list-style-type:none;}
+
+#tops_bg{
+border: 1px solid #000099;
+background-image: url(../images/lt.png);
+background-repeat: repeat-x;
+width: 99.9%;
+height: 37px;
+}
+
+
+.tops{
+	width:Auto;
+	height:40px;
+	margin:0 auto;
+}
+
+.nav_z{
+	width:auto!important;
+	height:40px;
+	float:left;position:relative;
+	z-index:999 ;
+	}
+#navul li{
+	float:left;
+	width:90px;
+	height:37px;
+	position:relative;
+	text-align:center;
+	line-height:37px;
+	margin-left: 10px;
+	}
+#navul li a:link, #navul li a:visited{
+	color:#FFF;
+	font-weight:500;
+	letter-spacing:2px;
+	}
+/*二级菜单的样式  */
+#navul li ul{
+	display:none;
+	position:absolute;
+	z-index:999;
+	background:#e6e6e6;
+	border:#c6c6c6 1px solid;
+	border-bottom:none;
+	left:-1px;
+	}
+#navul li ul li{
+	margin:0px;
+	display:block;
+	width:89px;
+	float:none;
+	height:35px;
+	position:relative;
+	line-height:35px;
+	border-bottom:#C6C6C6 1px solid;
+	font-size:14px;
+	overflow:hidden
+	}
+/*鼠标移动时  */
+#navul li.navmoon{
+	color:white;
+	background:#1C86EE;
+	height:38px;
+	font-size:14px;
+	}
+/*菜单被选中时的属性  */
+#navul li a.active {
+	background:#1C86EE;
+	color:white;
+	font-weight: bold;
+	font-size: 14px;
+	height: 37px;
+	line-height:37px;
+	display: block;
+	width:78px;
+	}
+#navul li.navmoon a{
+	color:#404a58;
+	}
+#navul li.navmoon ul{
+	display:block;
+	}
+#navul li.navmoon ul a{
+	display:block;
+	width:100px;
+	height:35px;
+	line-height:35px;
+	}
+/*二级菜单的hover属性  */
+#navul li.navmoon ul a:hover{
+	color:#0573bd;
+	background:white;
+	}
+
+ 

@@ -1,0 +1,84 @@
+{
+    "mode":"0",
+    "title":"产品追溯模式",
+    "menus": [
+        {
+            "id": "company-welcome",
+            "title":"首页",
+            "link": "/company/main/",
+            "authority": "0"
+        },
+        {
+            "id": "company-update",
+            "title":"企业信息",
+            "link": "/company/update/",
+            "css": "img_deploy_company",
+            "authority": "0"
+        },
+        {
+            "id": "company-product",
+            "title":"产品类型",
+            "link": "/company/product/main/",
+            "css":"img_deploy_product",
+            "authority": "0"
+        },
+        {
+            "id": "company-equipment",
+            "title":"设备管理",
+            "link": "/company/equipment/main/",
+            "css":"img_home_equipment",
+            "authority": "0"
+        },
+        {
+            "id": "company-inspect-device",
+            "title":"稽查终端",
+            "link": "/company/inspectDevice/main/",
+            "css":"img_deploy_device",
+            "authority": "0"
+        },
+        {
+            "id": "company-user",
+            "title":"用户配置",
+            "link": "/company/user/main/",
+            "css":"img_deploy_user",
+            "authority": "1"
+        },
+        {
+            "id": "company-count",
+            "title":"统计",
+            "link": "/company/count/main",
+            "css":"img_company_count",
+            "authority": "0",
+            "submenu":[
+                {
+                    "id": "company-count-base",
+                    "title":"基本统计",
+                    "link": "/company/count/main"
+                },
+                {
+                    "id": "company-count-out",
+                    "title":"出库统计",
+                    "link": "/company/count/outPutMain"
+                },
+                {
+                    "id": "company-count-ac",
+                    "title":"窜货统计",
+                    "link": "/company/count/acCntMain"
+                }
+            ]
+        },
+        {
+            "id": "company-acInfo",
+            "title":"窜货查询",
+            "link": "/company/acInfo/main/",
+            "css":"img_acInfo",
+            "authority": "0"
+        },
+        {
+            "id": "company-pwd",
+            "title":"修改密码",
+            "link": "/company/updpwd/",
+            "authority": "0"
+        }
+    ]
+}

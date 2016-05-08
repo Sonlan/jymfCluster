@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.LogsMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Logs" >
+    <result column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
+    <result column="EVENT" property="event" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="DECIMAL" />
+    <result column="companyName" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="org.jymf.entity.Logs" >
+    insert into TBL_LOGS 
+         (
+           ID, 
+           USER_ID, 
+           EVENT, 
+           DESCRIPTION,
+           CREATE_TIME,
+           COMPANY_ID
+         )
+    values 
+         (
+           #{id,jdbcType=DECIMAL},  
+           #{userId,jdbcType=VARCHAR}, 
+           #{event,jdbcType=VARCHAR}, 
+           #{description,jdbcType=VARCHAR},
+           NOW(),
+           #{companyId,jdbcType=DECIMAL}
+         )
+  </insert>
+  
+  	<!--日志信息查询,分页,根据日志动作,日期的时间段来进行检索  -->
+	<select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+			SELECT  log.ID,
+			        log.USER_ID, 
+	                log.EVENT, 
+	                log.DESCRIPTION,
+                    log.CREATE_TIME,
+                    log.company_id,
+                    com.name as companyName
+			  FROM  TBL_LOGS log 
+              LEFT JOIN tbl_company com
+                ON log.company_id=com.id
+			<where>
+			        1=1
+				<if test="t.event != null and t.event != ''">
+				AND	EVENT like '%${t.event}%'
+				</if>
+				<if test="t.userId != null and t.userId != ''">
+                AND USER_ID = '${t.userId}'
+                </if>
+				AND	CREATE_TIME BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+			</where>
+			ORDER BY log.ID DESC
+	</select>
+  
+</mapper>

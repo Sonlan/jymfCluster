@@ -1,0 +1,53 @@
+{
+    "mode":"7",
+    "title":"快消品追溯模式",
+    "menus": [
+        {
+            "id": "company-welcome",
+            "title":"首页",
+            "link": "/company/main/",
+            "authority": "0"
+        },
+        {
+            "id": "company-update",
+            "title":"企业信息",
+            "link": "/company/update/",
+            "css": "img_deploy_company",
+            "authority": "0"
+        },
+        {
+            "id": "company-product",
+            "title":"产品类型",
+            "link": "/company/product/main/",
+            "css":"img_deploy_product",
+            "authority": "0"
+        },
+        {
+            "id": "company-equipment",
+            "title":"设备管理",
+            "link": "/company/equipment/main/",
+            "css":"img_home_equipment",
+            "authority": "0"
+        },
+        {
+            "id": "company-user",
+            "title":"用户配置",
+            "link": "/company/user/main/",
+            "css":"img_deploy_user",
+            "authority": "1"
+        },
+        {
+            "id": "company-count",
+            "title":"统计",
+            "link": "/company/count/main",
+            "css":"img_company_count",
+            "authority": "0"
+        },
+        {
+            "id": "company-pwd",
+            "title":"修改密码",
+            "link": "/company/updpwd/",
+            "authority": "0"
+        }
+    ]
+}

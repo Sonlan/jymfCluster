@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.LabelIndexMapper">
+  <resultMap id="BaseResultMap" type="org.jymf.entity.LabelIndex">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="COMPANY_ID" jdbcType="DECIMAL" property="companyId" />
+    <result column="START_TID" jdbcType="DECIMAL" property="startTid" />
+    <result column="END_TID" jdbcType="DECIMAL" property="endTid" />
+    <result column="NAME" jdbcType="VARCHAR" property="name"/>
+    <result column="COUNT" jdbcType="DECIMAL" property="count"/>
+    <result column="WORK_MODE" jdbcType="DECIMAL" property="workMode"/>
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate"/>
+  </resultMap>
+
+  <!--resultType="BaseResultMap" 每返回一条结果封装到BaseResultMap(公司列表)里 -->
+  <!-- cqs 2014/05/13 add -->
+  <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+    SELECT
+          label.ID,
+          label.START_TID,
+          label.END_TID,
+          com.name,
+          com.WORK_MODE,
+          label.COMPANY_ID,
+          label.STATUS,
+          (label.END_TID - label.START_TID + 1) AS COUNT,CREATE_DATE
+     FROM (SELECT * FROM TBL_LABEL_INDEX UNION SELECT * FROM TBL_LABEL_INDEX_S) label,
+          TBL_COMPANY com
+          <if test="agentId != null and agentId != 0">
+            ,TBL_AGENT_MONITOR_RELATION a
+          </if>
+    <where>
+          1=1
+      <if test="t.name != null and t.name != ''">
+      AND  com.NAME like '%${t.name}%'
+      </if>
+      AND label.COMPANY_ID = com.ID
+      <if test="agentId != null and agentId != 0">
+      AND a.AGENT_ID = #{agentId,jdbcType=DECIMAL}
+      AND label.COMPANY_ID = a.COMPANY_ID
+      AND a.STATUS = 0
+      </if>
+      </where>
+      ORDER BY CREATE_DATE DESC
+  </select>
+    
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    SELECT 
+          label.ID,
+          label.START_TID,
+          label.END_TID,
+          label.STATUS,
+          label.COMPANY_ID,
+          com.name,
+          (label.END_TID - label.START_TID + 1) AS COUNT
+     FROM (SELECT * FROM TBL_LABEL_INDEX UNION SELECT * FROM TBL_LABEL_INDEX_S) label
+     LEFT JOIN TBL_COMPANY com
+       ON label.COMPANY_ID = com.ID
+    WHERE label.ID = #{id,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="findByLabelId" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    SELECT 
+          label.ID,
+          label.START_TID,
+          label.END_TID,
+          label.STATUS,
+          label.COMPANY_ID,
+          com.name,
+          (label.END_TID - label.START_TID + 1) AS COUNT
+     FROM (SELECT * FROM TBL_LABEL_INDEX UNION SELECT * FROM TBL_LABEL_INDEX_S) label
+     LEFT JOIN TBL_COMPANY com
+       ON label.COMPANY_ID = com.ID
+    WHERE #{labelId,jdbcType=DECIMAL} BETWEEN label.START_TID AND label.END_TID
+  </select>
+  
+  <insert id="insertIndex" parameterType="org.jymf.entity.LabelIndex">
+    insert into TBL_LABEL_INDEX (ID, STATUS, COMPANY_ID, START_TID, END_TID)
+    values (#{id,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{companyId,jdbcType=DECIMAL}, 
+      #{startTid,jdbcType=DECIMAL}, #{endTid,jdbcType=DECIMAL})
+  </insert>
+  
+  <update id="updateIndex" parameterType="org.jymf.entity.LabelIndex">
+    update TBL_LABEL_INDEX
+    <set>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null">
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="startTid != null">
+        START_TID = #{startTid,jdbcType=DECIMAL},
+      </if>
+      <if test="endTid != null">
+        END_TID = #{endTid,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+    
+  <insert id="insertIndexS" parameterType="org.jymf.entity.LabelIndex">
+    insert into TBL_LABEL_INDEX_S (ID, STATUS, COMPANY_ID, START_TID, END_TID)
+    values (#{id,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{companyId,jdbcType=DECIMAL}, 
+      #{startTid,jdbcType=DECIMAL}, #{endTid,jdbcType=DECIMAL})
+  </insert>
+  
+  <update id="updateIndexS" parameterType="org.jymf.entity.LabelIndex">
+    update TBL_LABEL_INDEX_S
+    <set>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null">
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="startTid != null">
+        START_TID = #{startTid,jdbcType=DECIMAL},
+      </if>
+      <if test="endTid != null">
+        END_TID = #{endTid,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+</mapper>

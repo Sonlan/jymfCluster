@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.EquipmentMapper">
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Equipment">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="DEV_INFO" jdbcType="VARCHAR" property="devInfo" />
+    <result column="PRE_KEY" jdbcType="VARCHAR" property="preKey" />
+    <result column="DEV_STATUS" jdbcType="DECIMAL" property="devStatus" />
+    <result column="LIMIT" jdbcType="DECIMAL" property="limit" />
+    <result column="COMPANY_ID" jdbcType="VARCHAR" property="companyId" />
+    <result column="NAME" jdbcType="VARCHAR" property="name"/>
+    <result column="PRODUCT_ID" jdbcType="DECIMAL" property="productId" />
+    <result column="WORK_MODE" jdbcType="DECIMAL" property="workMode" />
+  </resultMap>
+  
+  <!--resultType="BaseResultMap" 每返回一条结果封装到BaseResultMap(公司列表)里 -->
+  <!-- cqs 2014/05/13 add -->
+  <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+		SELECT
+		    e.ID,
+		    com.name,
+		    e.COMPANY_ID,
+		    e.LIMIT,
+		    e.DEV_STATUS,
+		    e.PRODUCT_ID,
+		    com.WORK_MODE,
+		    e.DEV_INFO
+		FROM EQUIPMENT e,TBL_COMPANY com
+		    <if test="agentId != null and agentId != 0">
+		        ,TBL_AGENT_MONITOR_RELATION a
+		    </if>
+		<where>
+		    1=1
+			<if test="t.name != null and t.name != ''">
+			    AND	com.NAME like '%${t.name}%'
+			</if>
+			<if test="t.id != null and t.id != 0">
+			    AND	e.ID = #{t.id,jdbcType=DECIMAL}
+			</if>
+			
+			<!-- agent user select -->
+			<if test="agentId != null and agentId != 0">
+			    AND a.AGENT_ID = #{agentId,jdbcType=DECIMAL}
+			    AND e.COMPANY_ID = a.COMPANY_ID
+			</if>
+			<!-- company user select -->
+			<if test="t.companyId != null and t.companyId != 0">
+                AND e.COMPANY_ID = #{t.companyId,jdbcType=VARCHAR}                
+            </if>
+			AND e.COMPANY_ID = com.ID
+		</where>
+		ORDER BY e.ID DESC
+  </select>
+
+  <select id="selectCountBycompany" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+    SELECT 
+          count(e.ID)
+     FROM EQUIPMENT e
+    WHERE e.COMPANY_ID = #{companyId,jdbcType=VARCHAR}  
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT 
+          e.ID,
+		  com.name,
+		  e.LIMIT,
+		  e.DEV_STATUS,
+		  e.COMPANY_ID,
+		  e.PRODUCT_ID,
+		  com.WORK_MODE,
+		  e.DEV_INFO
+     FROM EQUIPMENT e
+     LEFT JOIN TBL_COMPANY com
+       ON CAST(e.COMPANY_ID AS DECIMAL) = com.ID
+    WHERE e.ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from EQUIPMENT
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="org.jymf.entity.Equipment">
+    insert into EQUIPMENT (
+            ID, 
+            DEV_INFO, 
+            PRE_KEY, 
+            DEV_STATUS, 
+            `LIMIT`, 
+            COMPANY_ID,
+            PRODUCT_ID
+           )
+    values (
+            #{id,jdbcType=VARCHAR}, 
+            #{devInfo,jdbcType=VARCHAR},
+            #{preKey,jdbcType=VARCHAR}, 
+            #{devStatus,jdbcType=DECIMAL}, 
+            #{limit,jdbcType=DECIMAL}, 
+            #{companyId,jdbcType=VARCHAR}, 
+            #{productId,jdbcType=DECIMAL}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="org.jymf.entity.Equipment">
+    insert into EQUIPMENT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="devInfo != null">
+        DEV_INFO,
+      </if>
+      <if test="preKey != null">
+        PRE_KEY,
+      </if>
+      <if test="devStatus != null">
+        DEV_STATUS,
+      </if>
+      <if test="limit != null">
+        LIMIT,
+      </if>
+      <if test="companyId != null">
+        COMPANY_ID,
+      </if>
+      <if test="productId != null">
+        PRODUCT_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="devInfo != null">
+        #{devInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="preKey != null">
+        #{preKey,jdbcType=VARCHAR},
+      </if>
+      <if test="devStatus != null">
+        #{devStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="limit != null">
+        #{limit,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null">
+        #{companyId,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null">
+        #{productId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.Equipment">
+    update EQUIPMENT
+    <set>
+      <if test="devInfo != null">
+        DEV_INFO = #{devInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="preKey != null">
+        PRE_KEY = #{preKey,jdbcType=VARCHAR},
+      </if>
+      <if test="devStatus != null">
+        DEV_STATUS = #{devStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="limit != null">
+        `LIMIT` = #{limit,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null">
+        COMPANY_ID = #{companyId,jdbcType=VARCHAR},
+      </if>
+        PRODUCT_ID = #{productId,jdbcType=DECIMAL}
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.Equipment">
+    update EQUIPMENT
+    set DEV_INFO = #{devInfo,jdbcType=VARCHAR},
+      PRE_KEY = #{preKey,jdbcType=VARCHAR},
+      DEV_STATUS = #{devStatus,jdbcType=DECIMAL},
+      `LIMIT` = #{limit,jdbcType=DECIMAL},
+      COMPANY_ID = #{companyId,jdbcType=VARCHAR},
+      PRODUCT_ID = #{productId,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

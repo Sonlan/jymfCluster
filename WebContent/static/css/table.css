@@ -1,0 +1,99 @@
+/*
+*	本部分处理手机效果预览table样式
+*/
+.phoneBack{
+	height:500px;width:270px; background-image:url('../images/showPhone.png');background-repeat:no-repeat; 
+	-moz-background-size:230px;background-size:230px;
+	position: fixed;z-index: 9999;right:-300px;top:100px; border:0
+}
+#phonePic{
+	margin-top: 68px;margin-left: 14px;width:203px;height:70%;padding: 0;overflow: scroll;margin-right: 0;
+}
+.phoneTable{
+	width:100%;margin: 0;padding: 0;font-family: 黑体;  border-spacing: 0px;
+}
+.trFirst{
+	border:0px;background-color:#101a2c;margin: 0;padding: 0; height: 30px;font-size: 14px;
+}
+.tdFirst{
+	margin: 0;padding: 0;color: white;vertical-align: bottom;
+}
+.trContent{
+	margin: 0; height: 40px;font-size: 12px;padding: 5px;
+}
+.tdContent{
+	padding-bottom: 2px; padding-left: 5px;border-bottom: solid 1px #CAC9CE;
+}
+.td1{
+	width:50%;padding-bottom: 2px;vertical-align: middle;padding-left: 10px;
+}
+.td2{
+	color: #8A8992;vertical-align: middle;padding:10px 10px 10px 0;
+}
+.cancel{
+	border-style:solid; border-width :1px;width: 32px;height:32px;border-radius:100%;
+	-o-border-radius:100%;-webkit-border-radius:100%;-moz-border-radius:100%; 
+	margin-left: 98.5px;margin-top: 10px;  filter:alpha(opacity=0); 
+	opacity:0; cursor: pointer;overflow: hidden;
+}
+
+
+/** 本部分处理标签申请页面 履历table  */
+.lvli_table{
+	margin-left: 10px;border: 1px solid #A9A9A9; width:834px;padding: 0;border-collapse: collapse;
+	text-align: center;
+}
+.lvli_tr:hover{
+	line-height: 25px;background-color: #FAEBD7;
+}
+.lvli_tr{
+	line-height: 25px;
+}
+.lvli_td{
+	border: 1px solid #A9A9A9;line-height: 25px;
+}
+
+/** 履历申请页面 添加 管理 等页面按钮样式 */
+.lvli_btn{
+	height:35px;width:120px;background-color: #2B7DE1;color: white;font-family:'黑体'; font-size:20px; border:0;
+	box-shadow: 1px 2px 0px #3843AF;
+}
+.lvli_btn:hover{
+	height:35px;width:120px;background-color: #2B7DE1;color: white;font-family:'黑体'; font-size:20px; border:0;
+	box-shadow: 1px 2px 0px #3843AF;cursor: pointer;
+}
+.margin_left20{
+	margin-left: 20px;
+}
+.margin_left200{
+	margin-left: 200px;
+}
+.margin_left300{
+	margin-left: 300px;
+}
+.margin_left500{
+	margin-left: 500px;
+}
+.btn_table{
+	padding: 15px;
+}
+
+/** 凭证预览界面tabel  */
+.bill_div{
+	width:60%;margin: 0 auto;
+}
+.bill_table{
+	border-collapse: collapse;width:100%;
+}
+.bill_head{
+	font-size: 20px;font-weight: bold;padding: 20px 0px;
+}
+.bill_content{
+	font-size: 15px;padding: 10px 0px 10px 10px;
+}
+.td_head{
+	width:20%;
+}
+.td_content{
+	width:30%;
+}

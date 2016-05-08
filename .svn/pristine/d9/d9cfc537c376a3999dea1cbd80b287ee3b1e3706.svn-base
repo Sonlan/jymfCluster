@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.CordycepsMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.Cordyceps" >
+    <id column="materialBatchId" property="materialBatchId" jdbcType="VARCHAR" />
+    <result column="formerLeader" property="formerLeader" jdbcType="VARCHAR" />
+    <result column="wheatBatchId" property="wheatBatchId" jdbcType="VARCHAR" />
+    <result column="wheatInventory" property="wheatInventory" jdbcType="VARCHAR" />
+    <result column="wheatQualifiedId" property="wheatQualifiedId" jdbcType="VARCHAR" />
+    <result column="bacterialBatchId" property="bacterialBatchId" jdbcType="VARCHAR" />
+    <result column="bacterialQualId" property="bacterialQualId" jdbcType="VARCHAR" />
+    <result column="bacterialSeqNum" property="bacterialSeqNum" jdbcType="VARCHAR" />
+    <result column="cultivateLeader" property="cultivateLeader" jdbcType="VARCHAR" />
+    <result column="vacTime" property="vacTime" jdbcType="VARCHAR" />
+    <result column="bacterialRoom" property="bacterialRoom" jdbcType="VARCHAR" />
+    <result column="bacterialTime" property="bacterialTime" jdbcType="VARCHAR" />
+    <result column="postProcLeader" property="postProcLeader" jdbcType="VARCHAR" />
+    <result column="childQualId" property="childQualId" jdbcType="VARCHAR" />
+    <result column="childInTime" property="childInTime" jdbcType="DATE" />
+    <result column="childInNum" property="childInNum" jdbcType="VARCHAR" />
+    <result column="childYield" property="childYield" jdbcType="VARCHAR" />
+    <result column="conPowderInNum" property="conPowderInNum" jdbcType="VARCHAR" />
+    <result column="conPowderYield" property="conPowderYield" jdbcType="VARCHAR" />
+    <result column="myceliumInNum" property="myceliumInNum" jdbcType="VARCHAR" />
+    <result column="mycoplasmaInNum" property="mycoplasmaInNum" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    materialBatchId, formerLeader, wheatBatchId, wheatInventory, wheatQualifiedId, bacterialBatchId, 
+    bacterialQualId, bacterialSeqNum, cultivateLeader, vacTime, bacterialRoom, bacterialTime, 
+    postProcLeader, childQualId, childInTime, childInNum, childYield, conPowderInNum, 
+    conPowderYield, myceliumInNum, mycoplasmaInNum,createTime,updateTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_cordycep_content_358000059
+    where materialBatchId = #{materialBatchId,jdbcType=VARCHAR}
+    order by createTime desc
+  </select>
+
+  <insert id="insert" parameterType="org.jymf.entity.Cordyceps" >
+    insert into tbl_cordycep_content_358000059 (materialBatchId, formerLeader, wheatBatchId, 
+      wheatInventory, wheatQualifiedId, bacterialBatchId, 
+      bacterialQualId, bacterialSeqNum, cultivateLeader, 
+      vacTime, bacterialRoom, bacterialTime, 
+      postProcLeader, childQualId, childInTime, 
+      childInNum, childYield, conPowderInNum, 
+      conPowderYield, myceliumInNum, mycoplasmaInNum
+      )
+    values (#{materialBatchId,jdbcType=VARCHAR}, #{formerLeader,jdbcType=VARCHAR}, #{wheatBatchId,jdbcType=VARCHAR}, 
+      #{wheatInventory,jdbcType=VARCHAR}, #{wheatQualifiedId,jdbcType=VARCHAR}, #{bacterialBatchId,jdbcType=VARCHAR}, 
+      #{bacterialQualId,jdbcType=VARCHAR}, #{bacterialSeqNum,jdbcType=VARCHAR}, #{cultivateLeader,jdbcType=VARCHAR}, 
+      #{vacTime,jdbcType=VARCHAR}, #{bacterialRoom,jdbcType=VARCHAR}, #{bacterialTime,jdbcType=VARCHAR}, 
+      #{postProcLeader,jdbcType=VARCHAR}, #{childQualId,jdbcType=VARCHAR}, #{childInTime,jdbcType=TIMESTAMP}, 
+      #{childInNum,jdbcType=VARCHAR}, #{childYield,jdbcType=VARCHAR}, #{conPowderInNum,jdbcType=VARCHAR}, 
+      #{conPowderYield,jdbcType=VARCHAR}, #{myceliumInNum,jdbcType=VARCHAR}, #{mycoplasmaInNum,jdbcType=VARCHAR}
+     
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.jymf.entity.Cordyceps" >
+    insert into tbl_cordycep_content_358000059
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="materialBatchId != null" >
+        materialBatchId,
+      </if>
+      <if test="formerLeader != null" >
+        formerLeader,
+      </if>
+      <if test="wheatBatchId != null" >
+        wheatBatchId,
+      </if>
+      <if test="wheatInventory != null" >
+        wheatInventory,
+      </if>
+      <if test="wheatQualifiedId != null" >
+        wheatQualifiedId,
+      </if>
+      <if test="bacterialBatchId != null" >
+        bacterialBatchId,
+      </if>
+      <if test="bacterialQualId != null" >
+        bacterialQualId,
+      </if>
+      <if test="bacterialSeqNum != null" >
+        bacterialSeqNum,
+      </if>
+      <if test="cultivateLeader != null" >
+        cultivateLeader,
+      </if>
+      <if test="vacTime != null and vacTime !=''" >
+        vacTime,
+      </if>
+      <if test="bacterialRoom != null" >
+        bacterialRoom,
+      </if>
+      <if test="bacterialTime != null and bacterialTime !=''" >
+        bacterialTime,
+      </if>
+      <if test="postProcLeader != null" >
+        postProcLeader,
+      </if>
+      <if test="childQualId != null" >
+        childQualId,
+      </if>
+      <if test="childInTime != null and childInTime !=''" >
+        childInTime,
+      </if>
+      <if test="childInNum != null" >
+        childInNum,
+      </if>
+      <if test="childYield != null" >
+        childYield,
+      </if>
+      <if test="conPowderInNum != null" >
+        conPowderInNum,
+      </if>
+      <if test="conPowderYield != null" >
+        conPowderYield,
+      </if>
+      <if test="myceliumInNum != null" >
+        myceliumInNum,
+      </if>
+      <if test="mycoplasmaInNum != null" >
+        mycoplasmaInNum,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="materialBatchId != null" >
+        #{materialBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="formerLeader != null" >
+        #{formerLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatBatchId != null" >
+        #{wheatBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatInventory != null" >
+        #{wheatInventory,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatQualifiedId != null" >
+        #{wheatQualifiedId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialBatchId != null" >
+        #{bacterialBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialQualId != null" >
+        #{bacterialQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialSeqNum != null" >
+        #{bacterialSeqNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cultivateLeader != null" >
+        #{cultivateLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="vacTime != null and vacTime !=''" >
+        #{vacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialRoom != null" >
+        #{bacterialRoom,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialTime != null and bacterialTime !=''" >
+        #{bacterialTime,jdbcType=VARCHAR},
+      </if>
+      <if test="postProcLeader != null" >
+        #{postProcLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="childQualId != null" >
+        #{childQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="childInTime != null and childInTime !=''" >
+        #{childInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="childInNum != null" >
+        #{childInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="childYield != null" >
+        #{childYield,jdbcType=VARCHAR},
+      </if>
+      <if test="conPowderInNum != null" >
+        #{conPowderInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="conPowderYield != null" >
+        #{conPowderYield,jdbcType=VARCHAR},
+      </if>
+      <if test="myceliumInNum != null" >
+        #{myceliumInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="mycoplasmaInNum != null" >
+        #{mycoplasmaInNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.Cordyceps" >
+    update tbl_cordycep_content_358000059
+    <set >
+      <if test="formerLeader != null" >
+        formerLeader = #{formerLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatBatchId != null" >
+        wheatBatchId = #{wheatBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatInventory != null" >
+        wheatInventory = #{wheatInventory,jdbcType=VARCHAR},
+      </if>
+      <if test="wheatQualifiedId != null" >
+        wheatQualifiedId = #{wheatQualifiedId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialBatchId != null" >
+        bacterialBatchId = #{bacterialBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialQualId != null" >
+        bacterialQualId = #{bacterialQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialSeqNum != null" >
+        bacterialSeqNum = #{bacterialSeqNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cultivateLeader != null" >
+        cultivateLeader = #{cultivateLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="vacTime != null and vacTime !=''" >
+        vacTime = #{vacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialRoom != null" >
+        bacterialRoom = #{bacterialRoom,jdbcType=VARCHAR},
+      </if>
+      <if test="bacterialTime != null and bacterialTime !=''" >
+        bacterialTime = #{bacterialTime,jdbcType=VARCHAR},
+      </if>
+      <if test="postProcLeader != null" >
+        postProcLeader = #{postProcLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="childQualId != null" >
+        childQualId = #{childQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="childInTime != null and childInTime !=''" >
+        childInTime = #{childInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="childInNum != null" >
+        childInNum = #{childInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="childYield != null" >
+        childYield = #{childYield,jdbcType=VARCHAR},
+      </if>
+      <if test="conPowderInNum != null" >
+        conPowderInNum = #{conPowderInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="conPowderYield != null" >
+        conPowderYield = #{conPowderYield,jdbcType=VARCHAR},
+      </if>
+      <if test="myceliumInNum != null" >
+        myceliumInNum = #{myceliumInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="mycoplasmaInNum != null" >
+        mycoplasmaInNum = #{mycoplasmaInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null and updateTime !=''" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where materialBatchId = #{materialBatchId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.Cordyceps" >
+    update tbl_cordycep_content_358000059
+    set formerLeader = #{formerLeader,jdbcType=VARCHAR},
+      wheatBatchId = #{wheatBatchId,jdbcType=VARCHAR},
+      wheatInventory = #{wheatInventory,jdbcType=VARCHAR},
+      wheatQualifiedId = #{wheatQualifiedId,jdbcType=VARCHAR},
+      bacterialBatchId = #{bacterialBatchId,jdbcType=VARCHAR},
+      bacterialQualId = #{bacterialQualId,jdbcType=VARCHAR},
+      bacterialSeqNum = #{bacterialSeqNum,jdbcType=VARCHAR},
+      cultivateLeader = #{cultivateLeader,jdbcType=VARCHAR},
+      vacTime = #{vacTime,jdbcType=VARCHAR},
+      bacterialRoom = #{bacterialRoom,jdbcType=VARCHAR},
+      bacterialTime = #{bacterialTime,jdbcType=VARCHAR},
+      postProcLeader = #{postProcLeader,jdbcType=VARCHAR},
+      childQualId = #{childQualId,jdbcType=VARCHAR},
+      childInTime = #{childInTime,jdbcType=TIMESTAMP},
+      childInNum = #{childInNum,jdbcType=VARCHAR},
+      childYield = #{childYield,jdbcType=VARCHAR},
+      conPowderInNum = #{conPowderInNum,jdbcType=VARCHAR},
+      conPowderYield = #{conPowderYield,jdbcType=VARCHAR},
+      myceliumInNum = #{myceliumInNum,jdbcType=VARCHAR},
+      mycoplasmaInNum = #{mycoplasmaInNum,jdbcType=VARCHAR},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where materialBatchId = #{materialBatchId,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="cordycepsListquery" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+  	select 
+  	<include refid="Base_Column_List" /> 
+  	from tbl_cordycep_content_358000059 
+  	<where>
+         1=1
+         <if test="t.materialBatchId != null and t.materialBatchId != ''">
+        	<![CDATA[ AND trim(replace(materialBatchId,' ','')) LIKE trim(replace('%${t.materialBatchId}%',' ',''))]]>
+         </if>
+         <if test="t.formerLeader != null and t.formerLeader != ''">
+        	<![CDATA[ AND trim(replace(FORMERLEADER,' ','')) LIKE trim(replace('%${t.formerLeader}%',' ',''))]]>
+         </if>
+         <if test="t.cultivateLeader != null and t.cultivateLeader != ''">
+        	<![CDATA[ AND trim(replace(cultivateLeader,' ','')) LIKE trim(replace('%${t.cultivateLeader}%',' ',''))]]>
+         </if>
+         <if test="t.postProcLeader != null and t.postProcLeader != ''">
+        	<![CDATA[ AND trim(replace(postProcLeader,' ','')) LIKE trim(replace('%${t.postProcLeader}%',' ',''))]]>
+         </if>
+    </where>
+    order by createTime desc
+  </select>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.CompanyUserMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.CompanyUser" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="VARCHAR" />
+    <result column="AUTHORITY" property="authority" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="WORK_MODE" property="workMode" jdbcType="DECIMAL" />
+    <result column="URL" property="companyUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+      SELECT
+            Replace(user.ID,CONCAT('_',${t.companyId}),'') as ID, 
+            user.COMPANY_ID, 
+            user.CREATE_DATE,
+            user.AUTHORITY, 
+            user.STATUS,
+            company.URL
+       FROM TBL_COMPANY_USER user,TBL_COMPANY company
+      <where>
+             user.COMPANY_ID = #{t.companyId,jdbcType=DECIMAL}
+         AND user.COMPANY_ID = company.ID
+         AND user.id != #{t.id}
+         <if test="t.searchId != null and t.searchId != ''">
+             AND user.id like '%${t.searchId}%_${t.companyId}'
+         </if>
+      </where>
+       ORDER BY ID DESC
+  </select>
+  <!-- 通过ID和密码查找用户 -->
+  <select id="findUserByIdAndPwd" resultMap="BaseResultMap" parameterType="org.jymf.entity.CompanyUser" >
+    SELECT 
+          u.ID, 
+          u.COMPANY_ID, 
+          u.AUTHORITY,
+          u.STATUS,
+          c.WORK_MODE,
+          u.PASSWORD,
+          c.NAME as COMPANY_NAME,
+          c.URL
+     FROM TBL_COMPANY_USER u,TBL_COMPANY c
+    WHERE u.ID = #{id,jdbcType=VARCHAR}
+      AND u.PASSWORD = #{password,jdbcType=VARCHAR}
+      AND u.COMPANY_ID=c.ID
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+          user.ID,
+          user.PASSWORD, 
+          user.COMPANY_ID,
+          user.CREATE_DATE, 
+          user.AUTHORITY, 
+          user.STATUS,
+          com.NAME as COMPANY_NAME,
+          com.URL
+     FROM TBL_COMPANY_USER user,TBL_COMPANY com
+    WHERE user.ID = #{id,jdbcType=VARCHAR}
+      AND user.COMPANY_ID = com.ID
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from TBL_COMPANY_USER
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <!-- 2014/05/08 CREATE_DATE 删除，采用默认值 sysdate -->
+  <insert id="insert" parameterType="org.jymf.entity.CompanyUser" >
+    insert into TBL_COMPANY_USER (ID, PASSWORD, COMPANY_ID, CREATE_DATE,AUTHORITY, STATUS)
+    values (#{id,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{companyId,jdbcType=DECIMAL}, 
+    NOW(),#{authority,jdbcType=DECIMAL},#{status,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jymf.entity.CompanyUser" >
+    insert into TBL_COMPANY_USER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="password != null" >
+        PASSWORD,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+      <if test="authority != null" >
+        AUTHORITY,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="authority != null" >
+        #{authority,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.CompanyUser" >
+    update TBL_COMPANY_USER
+    <set >
+      <if test="password != null" >
+        PASSWORD = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="authority != null" >
+        AUTHORITY = #{authority,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.CompanyUser" >
+    UPDATE TBL_COMPANY_USER
+    SET PASSWORD = #{password,jdbcType=VARCHAR},
+      AUTHORITY = #{authority,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

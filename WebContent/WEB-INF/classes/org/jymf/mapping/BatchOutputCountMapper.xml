@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.BatchOutputCountMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.BatchOutputCount" >
+    <result column="product_id" property="productId" jdbcType="DECIMAL" />
+    <result column="sales_id" property="salesId" jdbcType="DECIMAL" />
+    <result column="query_cnt" property="queryCnt" jdbcType="DECIMAL" />
+    <result column="ac_cnt" property="acCnt" jdbcType="DECIMAL" />
+    <result column="cons_cnt" property="consCnt" jdbcType="DECIMAL" />
+    <result column="count_date" property="countDate" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- 获取出库数据的时间 --> 
+  <select id="selectTimeSection" parameterType="java.util.HashMap" resultType="java.util.Date">
+        SELECT  DISTINCT date_format(o.opt_time,'%Y-%m-%d') as opttime
+          FROM tbl_opt_actions_${companyId} o
+         WHERE o.OPT_ACTION=1
+           AND o.opt_time is not null
+         order by opttime
+  </select>
+
+  <!-- 获取所有公司ID 
+       WORK_MODE 3,汽配模式，汽配模式不做出库处理
+  --> 
+  <select id="selectAllCompanyId" resultType="java.math.BigDecimal">
+        SELECT ID 
+          FROM TBL_COMPANY 
+         WHERE WORK_MODE!=3 AND WORK_MODE!=8
+         ORDER BY ID
+  </select>
+  
+  <!-- 结果统计 -->
+  <sql id="sql" >
+   SELECT
+          label.product_Id,
+          (SELECT name from tbl_product_${companyId} product where product.id=label.product_Id) as product_Name,
+          label.salesId as sales_Id,
+          (SELECT name from tbl_area where id= label.salesId)as sales_area,
+          count(DISTINCT label.outPutId) as out_cnt,
+          sum(label.QUERY_COUNT) as query_cnt,
+          count(label.CONS_TIME_FIRST) as cons_cnt,
+          count(ac.LABEL_ID) as ac_cnt,
+          date_format('${date}','%Y-%m-%d') as Count_date
+     FROM
+	    (SELECT
+	           DISTINCT
+		       label.product_id,
+		       label.LABEL_ID,
+		       label.PACKAGE_ID,
+		       label.QUERY_COUNT,
+		       label.CONS_TIME_FIRST,
+		       (case when (label.SALES_AREA is null or label.SALES_AREA = 0 )then 1000000 
+		             else ROUND(label.SALES_AREA/10000) * 10000
+		        end) as salesId,
+		       opt.LABEL_ID as outPutId
+	       FROM 
+	           tbl_label_info_${companyId} label,
+	           tbl_opt_actions_${companyId} opt
+	      WHERE
+	            opt.OPT_ACTION=1
+	        AND opt.OPT_TIME BETWEEN '${date} 00:00:00' AND '${date} 23:59:59' 
+	        AND (opt.LABEL_ID=label.LABEL_ID OR opt.LABEL_ID=label.PACKAGE_ID))label
+	 LEFT JOIN
+	    (SELECT 
+	           DISTINCT LABEL_ID
+	      FROM TBL_AC_INFO_${companyId}
+	     WHERE ROUND(SALES_AREA/10000)!=ROUND(CONLLISION_AREA/10000)
+	     ) ac
+	 ON (label.LABEL_ID = ac.LABEL_ID)  
+	 GROUP BY label.product_Id      
+  </sql>
+  
+  <insert id="insertBatchCount" parameterType="java.util.HashMap" >
+    INSERT INTO TBL_OUT_COUNT_${companyId}
+      (product_id,
+	   Product_name,
+	   Sales_id,
+	   sales_area,
+	   Out_Cnt,
+	   Query_cnt,
+       Cons_cnt,
+	   Ac_cnt,
+	   Count_date
+      )
+     SELECT * 
+       FROM (
+            <include refid="sql" />
+            ) a
+      WHERE product_id != 100
+  </insert>
+  
+  <select id="selectHistoryCount" parameterType="java.util.HashMap" resultMap="BaseResultMap" >
+     SELECT a.product_id,
+            a.sales_id,
+            a.query_cnt,
+            a.cons_cnt,
+            a.ac_cnt,
+            ${date} as count_date
+       FROM 
+            (
+              select product_id,
+                     Sales_id,
+                     Query_cnt,
+                     Cons_cnt,
+                     Ac_cnt
+                from TBL_OUT_COUNT_${companyId}
+               where Count_date = date_format('${date}','%Y-%m-%d')
+            )a,
+            (
+                <include refid="sql" />
+            ) b
+      WHERE a.product_id = b.product_id
+        AND a.sales_id = b.sales_id
+        AND (   a.query_cnt != b.query_cnt
+             OR a.cons_cnt != b.cons_cnt
+             OR a.ac_cnt != b.ac_cnt
+            )
+        AND a.product_id != 100
+      ORDER BY a.product_id,
+               a.sales_id
+  </select>
+  <update id="updateHistoryCount" parameterType="org.jymf.entity.BatchOutputCount">
+        UPDATE TBL_OUT_COUNT_${companyId}
+           SET query_cnt = #{queryCnt,jdbcType=DECIMAL},
+               ac_cnt = #{acCnt,jdbcType=DECIMAL},
+               cons_cnt = #{consCnt,jdbcType=DECIMAL}
+         WHERE Count_date = date_format('${countDate}','%Y-%m-%d')
+           AND product_id = #{productId,jdbcType=DECIMAL}
+           AND sales_id = #{salesId,jdbcType=DECIMAL}
+   </update>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/layouts/">
+	<!-- 不包括在内的 -->
+	<excludes>
+		<pattern>/static/*</pattern>
+		<pattern>/admin/login</pattern>
+		<pattern>/admin/dialog/*</pattern>
+		<pattern>/company/login</pattern>
+		<pattern>/company/product/save*</pattern>
+		<pattern>/company/trace/detail*</pattern>
+		<pattern>/company/trace/selectRelationCordyceps*</pattern>
+		<pattern>/company/product/selectProduct</pattern>
+		<pattern>/admin/product/save*</pattern>
+		<pattern>/common/*</pattern>
+		<pattern>/agent/login</pattern>
+		<pattern>/monitor/login</pattern>
+	</excludes>
+ 
+ 	<!-- pattern:指向Controller里面的@RequestMapping()属性  -->
+	<decorator name="default" page="default.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+	
+	<decorator name="admin" page="admin/index.jsp">
+		<pattern>/admin/*</pattern>
+	</decorator>
+	
+    <decorator name="company" page="company/index.jsp">
+		<pattern>/company/*</pattern>
+	</decorator>
+	
+	<decorator name="agent" page="agent/index.jsp">
+		<pattern>/agent/*</pattern>
+	</decorator>
+	
+	<decorator name="monitor" page="monitor/index.jsp">
+		<pattern>/monitor/*</pattern>
+	</decorator>
+	<decorator name="monitorcompany" page="monitor/icompany.jsp">
+        <pattern>/monitor/company/*</pattern>
+    </decorator>
+</decorators>

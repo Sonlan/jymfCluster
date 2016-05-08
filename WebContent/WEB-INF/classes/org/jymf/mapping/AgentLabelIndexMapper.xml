@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.AgentLabelIndexMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.AgentLabelIndex" >
+    <id column="Id" property="id" jdbcType="BIGINT" />
+    <result column="AGENT_ID" property="agentId" jdbcType="BIGINT" />
+    <result column="Start_tid" property="startTid" jdbcType="BIGINT" />
+    <result column="End_tid" property="endTid" jdbcType="BIGINT" />
+    <result column="Status" property="status" jdbcType="TINYINT" />
+    <result column="Create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    Id, AGENT_ID, Start_tid, End_tid, Status, Create_date
+  </sql>
+  
+  <select id="query" resultMap="BaseResultMap" parameterType="java.lang.Long">
+   SELECT
+          ID,
+          START_TID,
+          END_TID,
+          STATUS,
+          (END_TID - START_TID + 1) AS COUNT,
+          CREATE_DATE
+     FROM TBL_AGENT_LABEL_INDEX 
+    WHERE
+          AGENT_ID = #{agentId,jdbcType=BIGINT}
+    ORDER BY ID DESC
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_agent_label_index
+    where Id = #{id,jdbcType=BIGINT}
+  </select>
+  <insert id="insert" parameterType="org.jymf.entity.AgentLabelIndex" >
+    insert into tbl_agent_label_index (Id, AGENT_ID, Start_tid, 
+      End_tid, Status, Create_date
+      )
+    values (#{id,jdbcType=BIGINT}, #{agentId,jdbcType=BIGINT}, #{startTid,jdbcType=BIGINT}, 
+      #{endTid,jdbcType=BIGINT}, #{status,jdbcType=TINYINT}, #{createDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.jymf.entity.AgentLabelIndex" >
+    insert into tbl_agent_label_index
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        Id,
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
+      <if test="startTid != null" >
+        Start_tid,
+      </if>
+      <if test="endTid != null" >
+        End_tid,
+      </if>
+      <if test="status != null" >
+        Status,
+      </if>
+      <if test="createDate != null" >
+        Create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=BIGINT},
+      </if>
+      <if test="startTid != null" >
+        #{startTid,jdbcType=BIGINT},
+      </if>
+      <if test="endTid != null" >
+        #{endTid,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.AgentLabelIndex" >
+    update tbl_agent_label_index
+    <set >
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=BIGINT},
+      </if>
+      <if test="startTid != null" >
+        Start_tid = #{startTid,jdbcType=BIGINT},
+      </if>
+      <if test="endTid != null" >
+        End_tid = #{endTid,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        Status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        Create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where Id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.AgentLabelIndex" >
+    update tbl_agent_label_index
+    set AGENT_ID = #{agentId,jdbcType=BIGINT},
+      Start_tid = #{startTid,jdbcType=BIGINT},
+      End_tid = #{endTid,jdbcType=BIGINT},
+      Status = #{status,jdbcType=TINYINT},
+      Create_date = #{createDate,jdbcType=TIMESTAMP}
+    where Id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

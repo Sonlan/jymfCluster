@@ -1,0 +1,226 @@
+.main {
+	margin: 0px;
+}
+/*全局字体大小*/
+	body { 
+	font-size:12px;
+	font-family: '宋体', Simsun;
+}
+/*添加外边框*/
+	.main_div {
+	border:0px solid #FFC1C1;
+	border-top:0px;
+	padding: 10px;
+}
+/*文本框样式*/
+	.text {
+	width:248px;
+	height:27px;
+	margin-left:10px;
+	line-height: 27px;
+	font-size:13px;
+}
+/*默认文本框样式*/
+	.texts {
+	width:190px;
+	height:25px;
+	margin-left:10px;
+	line-height: 25px;
+}
+/*文本域样式*/
+	.textare {
+	width:785px;
+	height:70px;
+	margin-left:15px;
+ 	font-size:12px;
+/*    font-family: '宋体', Simsun; */
+}
+/*产品类型文本域*/
+	.product_textare {
+	width:832px;
+	height:70px;
+	margin-left:10px;
+	font-size:13px; 
+ /*    font-family: '宋体', Simsun; */
+    resize:none;
+}
+/*下拉列表*/
+	.select {
+	width:275px;
+	height:32px;
+	margin-left:10px;
+}
+/*td间距*/
+.td {
+	margin-left:150px;
+	line-height: 27px;
+	
+}
+/*表格间距*/
+table td {
+	min-height: 20px;
+	padding: 2px 0 2px 0px;
+/*    padding:16px 0 3px 0px;*/
+/* 	vertical-align: top; */
+	vertical-align:middle;
+}
+/**样式*/
+	.must {
+	color:#FF0000;
+	/*font-size:16px;*/
+}
+/*头描述*/
+	.head_describe {
+	border:0px solid #000099;
+	background-color:#2b7de1;
+	width:200px;
+	height:25px;
+	line-height:25px;
+	text-align:center;
+	font-size:12px;
+	color:#FFFFFF;
+	margin:20px 0px 10px 0px;
+}
+/*通用的按钮-中等按钮*/
+	.center_btn {
+	border:0px solid;
+	background-image:url("../images/d_btn.png");
+	text-align: center;
+	line-height: 25px;
+	width:60px;
+	height: 30px;
+	color: white;
+	cursor: pointer;
+}
+/*查看链接样式-小按钮*/
+	.small_btn {
+	border: 0px solid;
+	width:50px;
+	height:25px;
+	background-image:url("../images/x_btn.png");
+	text-align: center;
+	line-height: 25px;
+}
+
+/*查看链接样式-小按钮*/
+	.small_hong_btn {
+	border: 0px solid;
+	width:50px;
+	height:25px;
+	background-image:url("../images/x_hong_btn.png");
+	text-align: center;
+	line-height: 25px;
+}
+.small_btn a {
+	text-align: center;
+}
+
+.small_hong_btn a {
+    text-align: center;
+}
+
+/*a标签样式*/
+	.linke {
+	color: white;
+	text-decoration: none;
+}
+/*确认按钮*/
+	.ok_button {
+	width:169px;
+	height:35px;
+	border:0px solid;
+	background-image:url(../images/ok_btn.png);
+	margin-left:20px;
+}
+    .audit_button {
+    width:169px;
+    height:35px;
+    border:0px solid;
+    background-image:url(../images/audit_btn.png);
+    margin-left:20px;
+}
+/*取消按钮*/
+	.cancer_btn {
+	width:169px;
+	height:35px;
+	border:0px solid;
+	background-image:url(../images/cancer_btn.png);
+	margin-left:10px;
+}
+.add_top{
+	width: 1100px;
+}
+.file-box {
+	position:absolute;
+	width:100px;
+	margin-left:15px;
+}
+.btn {
+	border:0px solid #CDCDCD;
+	height:28px;
+	width:36px;
+	background-image:url(../images/add.png);
+	background-color:transparent;
+}
+.file {
+	position:absolute;
+	top:0;
+	right:70px;
+	height:24px;
+	filter:alpha(opacity:0);
+	opacity: 0;
+	width:100px;
+}
+/*	删除按钮*/
+.del {
+	border: solid 0px;
+	background-image:url(../images/del.png);
+	background-color:transparent;
+	width:36px;
+	height:28px;
+}
+.add_btn {
+	margin:10px 0px 0px 300px;
+}
+.tipsIcon {
+	background: url('../images/vtip_arrow.png') no-repeat;
+	width:21px;
+	height:11px;
+}
+/*------------------------------------------------------------------------------------------------*/
+	/*配置按钮*/
+	.deploys {
+	background-image: url(../images/deploy.png);
+	width:49px;
+	height: 28px;
+	border:0px solid;
+	background-color: transparent;
+	margin-left: 10px;
+}
+.readonly {
+	cursor:not-allowed;
+	background-color:#D0D0D0;
+	border:1px solid #B5B5B5;
+	width:272px;
+	margin-left: 10px;
+}
+
+/* footer */
+#footer {
+    margin-top: 15px;
+    padding: 15px 0px 0px 0px;
+    font-size: 95%;
+    text-align: center;
+    /*border-top: 2px solid #658A16;*/
+}
+
+#table_1_titlebar div{
+	float:left;
+}
+
+/* 产品参数表样式 */
+.pro_param{
+	border:0px solid;
+	resize:none;
+}
+

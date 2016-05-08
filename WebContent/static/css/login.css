@@ -1,0 +1,74 @@
+body {
+	margin:0px;
+	font-family: '宋体', Simsun;
+	font-size:12px;
+}
+.top_left {
+	background-image:url(../images/1_01.png);
+	border:none;
+	width:604px;
+	height:254px;
+	float:left
+}
+.top_right {
+	background-image:url(../images/1_02.png);
+	border:none;
+	width:248px;
+	height:254px;
+	float:right
+}
+.centre {
+	position:absolute;
+	left:35%;
+	top:10%
+}
+.centre_one {
+	background-image:url(../images/2.png);
+	border:none;
+	width:428px;
+	height:261px;
+	margin-left:30px;
+}
+.centre_two {
+	margin-top:40px;
+	font-weight:bold
+}
+.input {
+	width:200px;
+	height:25px;
+}
+.centre_therr {
+	background-image:url(../images/1.png);
+	border:none;
+	width:134px;
+	height:27px;
+	margin-top:40px;
+	margin-left:42px;
+	border:0px solid;
+}
+.centre_four {
+	background-image:url(../images/4.png);
+	border:none;
+	width:292px;
+	height:71px;
+	margin-top:50px;
+	margin-left:105px;
+	border:0px solid;
+	background-color:transparent;
+}
+.zd {
+	margin-top:10px;
+}
+
+.login{
+		font-size: 12px;
+		font-family: '宋体'; 
+		font-weight: bold;
+		padding-right:10px;
+	}
+span{
+	font-size: 12px;
+}
+.login_tr{
+	height:35px;
+}

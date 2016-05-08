@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.SysSetMapper" >
+ 
+  <select id="selectByName" parameterType="java.lang.String" resultType="java.lang.String">
+    SELECT value
+      FROM TBL_SYS_SET
+     WHERE name = #{name,jdbcType=VARCHAR}
+  </select>
+
+  <update id="updateValue" parameterType="java.util.Map">
+    UPDATE TBL_SYS_SET
+       SET value = #{value,jdbcType=VARCHAR},
+           update_time = now()
+     WHERE name = #{name,jdbcType=VARCHAR}
+  </update>
+
+  <insert id="insert" parameterType="java.util.Map" >
+    insert into TBL_SYS_SET 
+         (
+           name, 
+           value
+         )
+    values 
+         (
+           #{name,jdbcType=VARCHAR}, 
+           #{value,jdbcType=VARCHAR}
+         )
+  </insert>
+  
+</mapper>

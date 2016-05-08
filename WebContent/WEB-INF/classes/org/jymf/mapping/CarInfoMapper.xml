@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.CarInfoMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.CarInfo" >
+    <id column="Id" property="id" jdbcType="BIGINT" />
+    <result column="carNo" property="carno" jdbcType="VARCHAR" />
+    <result column="engineNo" property="engineno" jdbcType="VARCHAR" />
+    <result column="VIN" property="vin" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="label_id" property="labelId" jdbcType="VARCHAR" />
+    <result column="Create_date" property="createDate" jdbcType="VARCHAR" />
+    <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!--resultType="BaseResultMap" 每返回一条结果封装到BaseResultMap(车辆信息列表)里 -->
+  <select id="queryCarInfo" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+	SELECT
+	       car.Id, 
+	       car.carNo, 
+	       car.engineNo, 
+	       car.company_id, 
+	       car.label_id, 
+	       car.vin,
+	       DATE_FORMAT(car.Create_date,'%Y-%m-%d %H:%i:%S') as Create_date,
+	       company.NAME as COMPANY_NAME
+	  FROM tbl_car_info car,
+	       tbl_company_monitor_relation relation,
+	       tbl_company company
+	 WHERE
+	       relation.monitor_id = #{t.monitorId,jdbcType=DECIMAL}
+	   AND car.company_id = relation.company_id
+	   AND relation.company_id = company.id
+	   AND company.work_mode = 3
+	   <if test="t.carno != null and t.carno != ''">
+	     AND car.carNo like '%${t.carno}%'
+	   </if>
+	   <if test="t.engineno != null and t.engineno != ''">
+	     AND car.engineNo like '%${t.engineno}%'
+       </if>
+       <if test="t.vin != null and t.vin != ''">
+	     AND car.vin like '%${t.vin}%'
+       </if>
+	 ORDER BY car.Create_date DESC 
+  </select>
+  
+  	<select id="selectById" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+		SELECT
+	           Id, 
+	           carNo, 
+	           engineNo, 
+	           company_id, 
+	           label_id, 
+	           vin,
+	           DATE_FORMAT(Create_date,'%Y-%m-%d %H:%i:%S') as Create_date
+	      FROM tbl_car_info
+		 WHERE ID = #{id,jdbcType=DECIMAL}
+	</select>
+</mapper>

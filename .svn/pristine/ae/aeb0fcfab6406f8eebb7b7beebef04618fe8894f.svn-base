@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jymf.dao.LabelApplyLogMapper">
+
+  <resultMap id="BaseResultMap" type="org.jymf.entity.LabelApplyLog">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="APPLY_ID" jdbcType="DECIMAL" property="applyId"/>
+    <result column="USER_TYPE" jdbcType="INTEGER" property="userType" />
+    <result column="USER_ID" jdbcType="DECIMAL" property="userId"/>
+    <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+    <result column="STATUS" jdbcType="INTEGER" property="status"/>
+    <result column="LOG_TIME" jdbcType="TIMESTAMP" property="logTime"/>
+  </resultMap>
+
+	<sql id="Base_Column_List">
+		APPLY_ID,USER_TYPE,USER_ID,USER_NAME,STATUS,LOG_TIME
+	</sql>
+
+	<!-- 添加 -->
+	<insert id="add" parameterType="org.jymf.entity.LabelApplyLog">
+		insert into tbl_label_apply_log(
+		<include refid="Base_Column_List"/>
+		) values (
+			#{applyId,jdbcType=DECIMAL},
+			#{userType,jdbcType=INTEGER},
+			#{userId,jdbcType=DECIMAL},
+			#{userName,jdbcType=VARCHAR},
+			#{status,jdbcType=INTEGER},
+			NOW()
+		)
+	</insert>
+
+	<select id="findLogs" parameterType="java.util.Map" resultMap="BaseResultMap" >
+		select 
+			id, apply_id, user_type, user_id, user_name, status, log_time
+		from tbl_label_apply_log
+		where 1=1
+		<if test="t.applyId != null ">
+			and apply_id = #{t.applyId}
+		</if>
+	</select>
+	
+
+</mapper>

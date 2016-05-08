@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.AgentMonitorMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.AgentMonitor" >
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="PWD" jdbcType="VARCHAR" property="pwd" />
+		<result column="TEL" jdbcType="VARCHAR" property="tel" />
+		<result column="STATUS" jdbcType="DECIMAL" property="status" />
+		<result column="ACCOUNT" jdbcType="VARCHAR" property="account" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, NAME, TEL, STATUS,ACCOUNT, PWD
+	</sql>
+	
+	<!-- 通过用户名检索 -->
+	<select id="selectByAgentMonitor" parameterType="java.lang.String" resultType="org.jymf.entity.AgentMonitor">
+		SELECT  
+		<include refid="Base_Column_List" />
+   		from TBL_AGENT_MONITOR where ACCOUNT = #{account,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 通过用户名密码进行检索 -->
+  <select id="selectByAccountAndPassword" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TBL_AGENT_MONITOR
+    where ACCOUNT = #{account,jdbcType=VARCHAR}
+      and PWD = #{pwd,jdbcType=VARCHAR}
+  </select>
+	
+	<select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM TBL_AGENT_MONITOR
+		<where>
+		    1=1
+			<if test="t.name != null and t.name != ''">
+			AND NAME like '%${t.name}%'
+			</if>
+			<if test="t.id != null and t.id != 0">
+			AND ID = #{t.id,jdbcType=DECIMAL}
+			</if>
+		</where>
+		ORDER BY ID DESC
+	</select>
+	
+    <select id="findMaxId" resultType="java.lang.Integer">
+		SELECT MAX(ID)  FROM TBL_AGENT_MONITOR
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="long"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from TBL_AGENT_MONITOR
+		where ID = #{id,jdbcType=DECIMAL}
+	</select>
+		
+	<insert id="insert" parameterType="org.jymf.entity.AgentMonitor">
+		insert into TBL_AGENT_MONITOR (NAME, PWD,
+		TEL, CREATE_TIME,STATUS, ACCOUNT)
+		values (#{name,jdbcType=VARCHAR},
+		#{pwd,jdbcType=VARCHAR},
+		#{tel,jdbcType=VARCHAR}, NOW(),
+		#{status,jdbcType=DECIMAL}, #{account,jdbcType=VARCHAR})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="org.jymf.entity.AgentMonitor">
+		insert into TBL_AGENT_MONITOR
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="pwd != null">
+				PWD,
+			</if>
+			<if test="tel != null">
+				TEL,
+			</if>
+			CREATE_TIME,
+			<if test="status != null">
+				STATUS,
+			</if>
+			<if test="account != null">
+				ACCOUNT,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=DECIMAL},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="pwd != null">
+				#{pwd,jdbcType=VARCHAR},
+			</if>
+			<if test="tel != null">
+				#{tel,jdbcType=VARCHAR},
+			</if>
+			sysdate,
+			<if test="status != null">
+				#{status,jdbcType=DECIMAL},
+			</if>
+			<if test="account != null">
+				#{account,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.AgentMonitor">
+		update TBL_AGENT_MONITOR
+		<set>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="pwd != null">
+				PWD = #{pwd,jdbcType=VARCHAR},
+			</if>
+			<if test="tel != null">
+				TEL = #{tel,jdbcType=VARCHAR},
+			</if>
+			    UPDATE_TIME = now(),
+			<if test="status != null">
+				STATUS = #{status,jdbcType=DECIMAL},
+			</if>
+			<if test="account != null">
+				ACCOUNT = #{account,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="org.jymf.entity.AgentMonitor">
+		update TBL_AGENT_MONITOR
+		set NAME = #{name,jdbcType=VARCHAR},
+		PWD = #{pwd,jdbcType=VARCHAR},
+		TEL = #{tel,jdbcType=VARCHAR},
+		UPDATE_TIME = now(),
+		STATUS = #{status,jdbcType=DECIMAL},
+		ACCOUNT = #{account,jdbcType=VARCHAR}
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	
+	<!-- 查询全部 -->
+	<select id="findAll" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+   		from TBL_AGENT_MONITOR
+	</select>
+	
+</mapper>

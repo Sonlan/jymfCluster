@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.CordycepsLogisticMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.CordycepsLogistic" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="startID" property="startID" jdbcType="BIGINT" />
+    <result column="endID" property="endID" jdbcType="BIGINT" />
+    <result column="proName" property="proName" jdbcType="VARCHAR" />
+    <result column="proBatchId" property="proBatchId" jdbcType="VARCHAR" />
+    <result column="materialBatchId" property="materialBatchId" jdbcType="VARCHAR" />
+    <result column="materialDosage" property="materialDosage" jdbcType="VARCHAR" />
+    <result column="inPacHead" property="inPacHead" jdbcType="VARCHAR" />
+    <result column="inPacTime" property="inPacTime" jdbcType="VARCHAR" />
+    <result column="inPacInstrument" property="inPacInstrument" jdbcType="VARCHAR" />
+    <result column="outPacHead" property="outPacHead" jdbcType="VARCHAR" />
+    <result column="outPacTime" property="outPacTime" jdbcType="VARCHAR" />
+    <result column="resBatchId" property="resBatchId" jdbcType="VARCHAR" />
+    <result column="proQualId" property="proQualId" jdbcType="VARCHAR" />
+    <result column="proInTime" property="proInTime" jdbcType="DATE" />
+    <result column="proInNum" property="proInNum" jdbcType="VARCHAR" />
+    <result column="proYield" property="proYield" jdbcType="VARCHAR" />
+    <result column="deliveryTime" property="deliveryTime" jdbcType="DATE" />
+    <result column="deliveryAddr" property="deliveryAddr" jdbcType="VARCHAR" />
+    <result column="saleMethod" property="saleMethod" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="buyUrl" property="buyUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id,startID,endID,proName, proBatchId, materialBatchId, materialDosage, inPacHead, inPacTime, inPacInstrument, 
+    outPacHead, resBatchId, outPacTime, proQualId, proInTime, proInNum, proYield, deliveryTime, deliveryAddr, 
+    saleMethod,createTime,updateTime,buyUrl
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_cordycep_tracking_358000059
+    where id = #{id,jdbcType=BIGINT}
+    order by createTime desc
+  </select>
+
+  <insert id="insert" parameterType="org.jymf.entity.CordycepsLogistic" >
+    insert into tbl_cordycep_tracking_358000059 (startID, endID,proName,proBatchId, 
+      materialBatchId, materialDosage, inPacHead, 
+      inPacTime, inPacInstrument, outPacHead, 
+      outPacTime, resBatchId,proQualId, proInTime, 
+      proInNum, proYield, deliveryTime, 
+      deliveryAddr, saleMethod,buyUrl)
+    values (#{startID,jdbcType=BIGINT},#{endID,jdbcType=BIGINT},#{proName,jdbcType=VARCHAR}, #{proBatchId,jdbcType=VARCHAR}, 
+      #{materialBatchId,jdbcType=VARCHAR}, #{materialDosage,jdbcType=VARCHAR}, #{inPacHead,jdbcType=VARCHAR}, 
+      #{inPacTime,jdbcType=VARCHAR}, #{inPacInstrument,jdbcType=VARCHAR}, #{outPacHead,jdbcType=VARCHAR}, 
+      #{outPacTime,jdbcType=VARCHAR},#{resBatchId,jdbcType=VARCHAR}, #{proQualId,jdbcType=VARCHAR}, #{proInTime,jdbcType=TIMESTAMP}, 
+      #{proInNum,jdbcType=VARCHAR}, #{proYield,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=TIMESTAMP}, 
+      #{deliveryAddr,jdbcType=VARCHAR}, #{saleMethod,jdbcType=VARCHAR},#{buyUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jymf.entity.CordycepsLogistic" >
+    insert into tbl_cordycep_tracking_358000059
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+    <if test="startID != null" >
+        startID,
+      </if>
+      <if test="endID != null" >
+        endID,
+      </if>
+      <if test="proName != null" >
+        proName,
+      </if>
+      <if test="proBatchId != null" >
+        proBatchId,
+      </if>
+      <if test="materialBatchId != null" >
+        materialBatchId,
+      </if>
+      <if test="materialDosage != null" >
+        materialDosage,
+      </if>
+      <if test="inPacHead != null" >
+        inPacHead,
+      </if>
+      <if test="inPacTime != null and inPacTime !=''" >
+        inPacTime,
+      </if>
+      <if test="inPacInstrument != null" >
+        inPacInstrument,
+      </if>
+      <if test="outPacHead != null" >
+        outPacHead,
+      </if>
+      <if test="outPacTime != null and outPacTime !=''" >
+        outPacTime,
+      </if>
+      <if test="resBatchId != null" >
+        resBatchId,
+      </if>
+      <if test="proQualId != null" >
+        proQualId,
+      </if>
+      <if test="proInTime != null and proInTime !=''" >
+        proInTime,
+      </if>
+      <if test="proInNum != null" >
+        proInNum,
+      </if>
+      <if test="proYield != null" >
+        proYield,
+      </if>
+      <if test="deliveryTime != null and deliveryTime !=''" >
+        deliveryTime,
+      </if>
+      <if test="deliveryAddr != null" >
+        deliveryAddr,
+      </if>
+      <if test="saleMethod != null" >
+        saleMethod,
+      </if>
+      <if test="buyUrl != null" >
+        buyUrl,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+    <if test="startID != null" >
+        #{startID,jdbcType=BIGINT},
+      </if>
+      <if test="endID != null" >
+        #{endID,jdbcType=BIGINT},
+      </if>
+      <if test="proName != null" >
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="proBatchId != null" >
+        #{proBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="materialBatchId != null" >
+        #{materialBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="materialDosage != null" >
+        #{materialDosage,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacHead != null" >
+        #{inPacHead,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacTime != null and inPacTime !=''" >
+        #{inPacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacInstrument != null" >
+        #{inPacInstrument,jdbcType=VARCHAR},
+      </if>
+      <if test="outPacHead != null" >
+        #{outPacHead,jdbcType=VARCHAR},
+      </if>
+      <if test="outPacTime != null and outPacTime !=''" >
+        #{outPacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="resBatchId != null" >
+        #{resBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="proQualId != null" >
+        #{proQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="proInTime != null and proInTime !=''" >
+        #{proInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="proInNum != null" >
+        #{proInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="proYield != null" >
+        #{proYield,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null and deliveryTime !=''" >
+        #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryAddr != null" >
+        #{deliveryAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="saleMethod != null" >
+        #{saleMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="buyUrl != null" >
+        #{buyUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jymf.entity.CordycepsLogistic" >
+    update tbl_cordycep_tracking_358000059
+    <set >
+   	 <if test="startID != null" >
+        startID = #{startID,jdbcType=BIGINT},
+      </if>
+      <if test="endID != null" >
+        endID = #{endID,jdbcType=BIGINT},
+      </if>
+      <if test="proName != null" >
+        proName = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="proBatchId != null" >
+        proBatchId = #{proBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="materialBatchId != null" >
+        materialBatchId = #{materialBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="materialDosage != null" >
+        materialDosage = #{materialDosage,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacHead != null" >
+        inPacHead = #{inPacHead,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacTime != null and inPacTime !=''" >
+        inPacTime = #{inPacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="inPacInstrument != null" >
+        inPacInstrument = #{inPacInstrument,jdbcType=VARCHAR},
+      </if>
+      <if test="outPacHead != null" >
+        outPacHead = #{outPacHead,jdbcType=VARCHAR},
+      </if>
+      <if test="outPacTime != null and outPacTime !=''" >
+        outPacTime = #{outPacTime,jdbcType=VARCHAR},
+      </if>
+      <if test="resBatchId != null" >
+        resBatchId = #{resBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="proQualId != null" >
+        proQualId = #{proQualId,jdbcType=VARCHAR},
+      </if>
+      <if test="proInTime != null and proInTime !=''" >
+        proInTime = #{proInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="proInNum != null" >
+        proInNum = #{proInNum,jdbcType=VARCHAR},
+      </if>
+      <if test="proYield != null" >
+        proYield = #{proYield,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null and deliveryTime !=''" >
+        deliveryTime = #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryAddr != null" >
+        deliveryAddr = #{deliveryAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="saleMethod != null" >
+        saleMethod = #{saleMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null and updateTime !=''" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="buyUrl != null and buyUrl !=''" >
+        buyUrl = #{buyUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jymf.entity.CordycepsLogistic" >
+    update tbl_cordycep_tracking_358000059
+    set startID = #{startID,jdbcType=BIGINT},
+      endID = #{endID,jdbcType=BIGINT}, 
+      proName = #{proName,jdbcType=VARCHAR},
+      proBatchId = #{proBatchId,jdbcType=VARCHAR},
+      materialBatchId = #{materialBatchId,jdbcType=VARCHAR},
+      materialDosage = #{materialDosage,jdbcType=VARCHAR},
+      inPacHead = #{inPacHead,jdbcType=VARCHAR},
+      inPacTime = #{inPacTime,jdbcType=VARCHAR},
+      inPacInstrument = #{inPacInstrument,jdbcType=VARCHAR},
+      outPacHead = #{outPacHead,jdbcType=VARCHAR},
+      outPacTime = #{outPacTime,jdbcType=VARCHAR},
+      resBatchId = #{resBatchId,jdbcType=VARCHAR},
+      proQualId = #{proQualId,jdbcType=VARCHAR},
+      proInTime = #{proInTime,jdbcType=TIMESTAMP},
+      proInNum = #{proInNum,jdbcType=VARCHAR},
+      proYield = #{proYield,jdbcType=VARCHAR},
+      deliveryTime = #{deliveryTime,jdbcType=TIMESTAMP},
+      deliveryAddr = #{deliveryAddr,jdbcType=VARCHAR},
+      saleMethod = #{saleMethod,jdbcType=VARCHAR},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      buyUrl = #{buyUrl,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <select id="cordycepsLogisListquery" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+  	select 
+  	<include refid="Base_Column_List" /> 
+  	from tbl_cordycep_tracking_358000059 
+  	<where>
+         1=1
+         <if test="t.proName != null and t.proName != ''">
+        	<![CDATA[ AND trim(replace(proName,' ','')) LIKE trim(replace('%${t.proName}%',' ','')) ]]>
+         </if>
+         <if test="t.proBatchId != null and t.proBatchId != ''">
+        	<![CDATA[ AND trim(replace(proBatchId,' ','')) LIKE trim(replace('%${t.proBatchId}%',' ','')) ]]>
+         </if>
+         <if test="t.startID != null and t.startID != ''">
+        	<![CDATA[ AND trim(replace(startID,' ','')) <= trim(replace('${t.startID}',' ','')) AND trim(replace(endID,' ','')) >= trim(replace('${t.startID}',' ','')) ]]>
+         </if>
+    </where>
+    order by createTime desc
+    
+  </select>
+  <select id="getCorLogisBySEId" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+  	select 
+  	<include refid="Base_Column_List" /> 
+  	from tbl_cordycep_tracking_358000059 
+  	<where>
+         1=1
+         <if test="startID != null and startID != '' and endID != null and endID != ''">
+        	 AND ((startID &lt;= ${endID} AND startID&gt;= ${startID}) 
+        	   OR (endID &gt;= ${startID} AND endID&lt;= ${endID}) 
+        	   OR (endID &lt;= ${endID} AND startID&gt;= ${startID})
+        	     )
+         </if>
+         <if test="id != null and id != 0">
+         	AND id !=${id}
+         </if>
+    </where>
+    
+  </select>
+    <select id="getCorLogisByTraceId" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+  	select 
+  	<include refid="Base_Column_List" /> 
+  	from tbl_cordycep_tracking_358000059 
+  	<where>
+         1=1
+         <if test="traceID != null and traceID != ''">
+        	<![CDATA[	 AND startID <= trim(replace('${traceID}',' ','')) AND endID >= trim(replace('${traceID}',' ','')) ]]>
+         </if>
+         <if test="id != null and id != 0">
+         	AND id !=${id}
+         </if>
+    </where>
+    
+  </select>
+</mapper>

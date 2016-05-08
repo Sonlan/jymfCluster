@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.AgentMonitorRelationMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.AgentMonitorRelation" >
+    <result column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="AGENT_ID" property="agentId" jdbcType="DECIMAL" />
+    <result column="START_DATE" property="startDate" jdbcType="DATE" />
+    <result column="END_DATE" property="endDate" jdbcType="DATE" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+  	<result column="NAME" jdbcType="VARCHAR" property="name"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+     ID, COMPANY_ID, START_DATE, END_DATE, STATUS,AGENT_ID,NAME
+  </sql>
+  
+  
+  <select id="query" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+		SELECT r.* ,c.name FROM 
+		TBL_AGENT_MONITOR_RELATION r,tbl_COMPANY c 
+		<where>
+		    1=1
+			<if test="t.agentId != null and t.agentId != ''">
+			AND	r.AGENT_ID = #{t.agentId,jdbcType=DECIMAL}
+			</if>
+			<if test="t.name != null and t.name != ''">
+			AND	c.name like '%${t.name}%'
+			</if>
+			AND r.COMPANY_ID=c.id
+		</where>
+		ORDER BY COMPANY_ID DESC
+	</select>
+
+    <!-- 更新状态 -->
+    <update id="updateStatus" parameterType="long">
+        UPDATE TBL_AGENT_MONITOR_RELATION 
+           SET status=IF(status=0,1,0)
+         WHERE id = #{id,jdbcType=DECIMAL}
+    </update>
+  
+  <select id="selectByAgentId" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TBL_AGENT_MONITOR_RELATION
+    where AGENT_ID = #{agentId,jdbcType=DECIMAL}
+  </select>
+  
+  <insert id="insert" parameterType="org.jymf.entity.AgentMonitorRelation">
+    insert into TBL_AGENT_MONITOR_RELATION (ID, COMPANY_ID, 
+      START_DATE, END_DATE, STATUS,AGENT_ID
+      )
+    values (#{id,jdbcType=DECIMAL}, #{companyId,jdbcType=DECIMAL}, 
+      #{startDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{status,jdbcType=DECIMAL},
+      #{agentId,jdbcType=DECIMAL}
+      )
+  </insert>
+  
+  <select id="findAngetByCompany" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select * from  TBL_AGENT_MONITOR_RELATION 
+  	where 1=1
+  	<if test="t.id != null">
+  		and company_id = #{t.id}
+  	</if>
+  </select>
+</mapper>

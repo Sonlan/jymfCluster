@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.OutPutCountMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.OutPutCount" >
+    <result column="product_id" property="productId" jdbcType="DECIMAL" />
+    <result column="Product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="sales_area" property="salesName" jdbcType="VARCHAR" />
+    <result column="Query_cnt" property="querySum" jdbcType="DECIMAL" />
+    <result column="Cons_cnt" property="consNum" jdbcType="DECIMAL" />
+    <result column="Ac_cnt" property="acNum" jdbcType="DECIMAL" />
+    <result column="Out_Cnt" property="outPutSum" jdbcType="DECIMAL" />
+  </resultMap>
+  <!-- 出库详细统计 -->
+  <select id="queryOutPutCount" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+     SELECT product_id,
+            Product_name,
+            sales_area,
+            sum(Out_Cnt) as Out_Cnt,
+            sum(Query_cnt) as Query_cnt,
+            sum(Cons_cnt) as Cons_cnt,
+            sum(Ac_cnt) as Ac_cnt
+       FROM (
+               SELECT
+                     product_id,
+                     Product_name,
+                     Sales_id,
+                     sales_area,
+                     Out_Cnt,
+                     Query_cnt,
+                     Cons_cnt,
+                     Ac_cnt,
+                     Count_date
+                FROM tbl_out_count_${t.companyId}
+               WHERE count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+              <if test="today != null and today == 1">
+	              union 
+	              <include refid="sql" />
+              </if>
+            ) a
+      WHERE a.count_Date BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59' 
+        AND a.product_id is not null
+        AND a.product_id != 100
+      <if test="t.productName != null and t.productName != ''">
+        AND productName like '%${t.productName}%'
+      </if>   
+     GROUP by product_id,product_name,sales_area
+     ORDER BY product_Id,Sales_id
+   </select>
+   
+  <!-- 当天信息统计 -->
+  <sql id="sql" >
+   SELECT
+          label.product_Id,
+          (SELECT name from tbl_product_${t.companyId} product where product.id=label.product_Id) as product_Name,
+          label.salesId as sales_Id,
+          (SELECT name from tbl_area where id= label.salesId)as sales_area,
+          count(DISTINCT label.outPutId) as out_cnt,
+          sum(label.QUERY_COUNT) as query_cnt,
+          count(label.CONS_TIME_FIRST) as cons_cnt,
+          count(ac.LABEL_ID) as ac_cnt,
+          date_format(now(),'%Y-%m-%d') as count_Date
+     FROM
+        (SELECT
+               DISTINCT
+               label.product_id,
+               label.LABEL_ID,
+               label.PACKAGE_ID,
+               label.QUERY_COUNT,
+               label.CONS_TIME_FIRST,
+               (case when (label.SALES_AREA is null or label.SALES_AREA = 0 )then 1000000 
+                     else ROUND(label.SALES_AREA/10000) * 10000
+                end) as salesId,
+               opt.LABEL_ID as outPutId
+           FROM 
+               tbl_label_info_${t.companyId} label,
+               tbl_opt_actions_${t.companyId} opt
+          WHERE
+                opt.OPT_ACTION=1
+            AND opt.OPT_TIME BETWEEN date_format(now(),'%Y-%m-%d 00:00:00')  AND date_format(now(),'%Y-%m-%d 23:59:59') 
+            AND (opt.LABEL_ID=label.LABEL_ID OR opt.LABEL_ID=label.PACKAGE_ID))label
+     LEFT JOIN
+        (SELECT 
+               DISTINCT LABEL_ID
+          FROM TBL_AC_INFO_${t.companyId}
+         WHERE ROUND(SALES_AREA/10000)!=ROUND(CONLLISION_AREA/10000)
+         ) ac
+     ON (label.LABEL_ID = ac.LABEL_ID)        
+  </sql>
+</mapper>

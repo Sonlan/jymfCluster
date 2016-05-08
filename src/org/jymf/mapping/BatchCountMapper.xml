@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.BatchCountMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.BatchCount" >
+    <result column="maxConsTime" property="maxConsTime" jdbcType="DATE" />
+    <result column="maxPackTime" property="maxPackTime" jdbcType="DATE" />
+    <result column="maxTime" property="maxTime" jdbcType="DATE" />
+    <result column="minTime" property="minTime" jdbcType="DATE" />
+    <result column="maxOptTime" property="maxOptTime" jdbcType="DATE" />
+  </resultMap>
+  
+  <!-- 获取被统计数据的开始时间和结束时间 --> 
+  <select id="selectTimeSection" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+  SELECT (select cons_time_first from tbl_label_info_${companyId} order by cons_time_first desc limit 1) as maxConsTime, 
+         (select packstamp from tbl_label_info_${companyId} order by packstamp desc limit 1) as maxPackTime,
+         (select timestamp from tbl_label_info_${companyId} order by timestamp desc limit 1) as maxTime,
+         (select timestamp from tbl_label_info_${companyId} order by timestamp asc limit 1) as minTime,
+         (select opt_time from tbl_opt_actions_${companyId} order by opt_time desc limit 1) as maxOptTime 
+  </select>
+
+  <!-- 获取所有公司ID --> 
+  <select id="selectAllCompanyId" resultType="java.math.BigDecimal">
+        SELECT ID 
+          FROM TBL_COMPANY 
+         WHERE WORK_MODE!=8
+         ORDER BY ID
+  </select>
+  
+  <!-- 结果统计 -->
+  <insert id="insertBatchCount" parameterType="java.util.HashMap" >
+      INSERT INTO TBL_COUNT_${companyId}
+             (product_id,
+              Product_name,
+              Package_Cnt,
+              Active_Cnt,
+              Out_Cnt,
+              In_Cnt,
+              Sales_Cnt,
+              Query_cnt,
+              Count_date
+             )
+      SELECT *
+        FROM
+         (SELECT product.id as product_id,
+                 product.name as Product_name,
+                 label.Package_Cnt, 
+                 label.Active_Cnt,
+                 opt.Out_Cnt,
+                 opt.In_Cnt,
+                 opt.Sales_Cnt,
+                 label.Query_cnt,
+                 date_format('${date}','%Y-%m-%d')
+             FROM
+                tbl_product_${companyId} product 
+                LEFT JOIN 
+                ( SELECT l.product_id ,
+                         sum(case date_format(l.packstamp,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Package_Cnt ,
+                         sum(case date_format(l.CONS_TIME_FIRST,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Query_cnt ,
+                         sum(case date_format(l.timestamp,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Active_Cnt
+                    FROM (SELECT l.product_id ,
+                                 l.packstamp,
+                                 l.CONS_TIME_FIRST,
+                                 l.timestamp
+                            FROM tbl_label_info_${companyId} l
+                           WHERE l.packstamp is not null
+                              OR l.CONS_TIME_FIRST is not null
+                              OR l.timestamp BETWEEN '${date} 00:00:00' AND '${date} 23:59:59' ) l
+                           GROUP BY l.product_id 
+                 ) label
+                    on product.id = label.product_id
+                LEFT JOIN 
+                ( SELECT l.product_id, 
+                         sum(case opt_action when 1 then 1 else 0 end) as Out_Cnt, 
+                         sum(case opt_action when 2 then 1 else 0 end) as In_Cnt, 
+                         sum(case opt_action when 3 then 1 else 0 end) as Sales_Cnt 
+                    FROM (SELECT distinct label_id,opt_action from tbl_opt_actions_${companyId}
+                           WHERE opt_time BETWEEN '${date} 00:00:00' AND '${date} 23:59:59' 
+                             AND opt_time is not null) o, tbl_label_info_${companyId} l
+                   WHERE o.label_id = l.label_id 
+                   GROUP BY l.product_id 
+                ) opt 
+               ON product.id = opt.product_id  
+            ) batch
+       WHERE ( (batch.Package_Cnt is not null AND batch.Package_Cnt > 0)
+            OR (batch.Active_Cnt  is not null AND batch.Active_Cnt  > 0)
+            OR (batch.Out_Cnt     is not null AND batch.Out_Cnt     > 0)
+            OR (batch.In_Cnt      is not null AND batch.In_Cnt      > 0)
+            OR (batch.Sales_Cnt   is not null AND batch.Sales_Cnt   > 0)
+            OR (batch.Query_cnt   is not null AND batch.Query_cnt   > 0)
+             )
+        <!--  AND batch.product_id != 100  -->
+  </insert>
+  <insert id="insertBatchCarCount" parameterType="java.util.HashMap" >
+        INSERT INTO TBL_COUNT_${companyId}
+             (product_id,
+              Product_name,
+              Package_Cnt,
+              Active_Cnt,
+              Out_Cnt,
+              In_Cnt,
+              Sales_Cnt,
+              Query_cnt,
+              Count_date
+             )
+      SELECT *
+        FROM
+         (SELECT label.product_id as product_id,
+                 '' as Product_name,
+                 label.Package_Cnt, 
+                 label.Active_Cnt,
+                 opt.Out_Cnt,
+                 opt.In_Cnt,
+                 opt.Sales_Cnt,
+                 label.Query_cnt,
+                 date_format('${date}','%Y-%m-%d')
+             FROM
+                ( SELECT l.product_id ,
+                         sum(case date_format(l.packstamp,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Package_Cnt ,
+                         sum(case date_format(l.CONS_TIME_FIRST,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Query_cnt ,
+                         sum(case date_format(l.timestamp,'%Y-%m-%d') when '${date}' then 1 else 0 end) as Active_Cnt
+                    FROM (SELECT l.product_id ,
+                                 l.packstamp,
+                                 l.CONS_TIME_FIRST,
+                                 l.timestamp
+                            FROM tbl_label_info_${companyId} l
+                           WHERE (l.packstamp is not null
+                              OR l.CONS_TIME_FIRST is not null
+                              OR l.timestamp BETWEEN '${date} 00:00:00' AND '${date} 23:59:59' 
+                              ) AND l.product_id = 100 
+                             ) l
+                 ) label, 
+                ( SELECT l.product_id, 
+                         sum(case opt_action when 1 then 1 else 0 end) as Out_Cnt, 
+                         sum(case opt_action when 2 then 1 else 0 end) as In_Cnt, 
+                         sum(case opt_action when 3 then 1 else 0 end) as Sales_Cnt 
+                    FROM (SELECT distinct label_id,opt_action from tbl_opt_actions_${companyId}
+                           WHERE opt_time BETWEEN '${date} 00:00:00' AND '${date} 23:59:59' 
+                             AND opt_time is not null) o, tbl_label_info_${companyId} l
+                   WHERE o.label_id = l.label_id 
+		             AND l.product_id = 100
+                ) opt 
+            ) batch
+       WHERE ( (batch.Package_Cnt is not null AND batch.Package_Cnt > 0)
+            OR (batch.Active_Cnt  is not null AND batch.Active_Cnt  > 0)
+            OR (batch.Out_Cnt     is not null AND batch.Out_Cnt     > 0)
+            OR (batch.In_Cnt      is not null AND batch.In_Cnt      > 0)
+            OR (batch.Sales_Cnt   is not null AND batch.Sales_Cnt   > 0)
+            OR (batch.Query_cnt   is not null AND batch.Query_cnt   > 0)
+             )
+  </insert>
+</mapper>

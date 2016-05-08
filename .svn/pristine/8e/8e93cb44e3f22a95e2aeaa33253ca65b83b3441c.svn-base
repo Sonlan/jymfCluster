@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jymf.dao.OptActionMapper" >
+  <resultMap id="BaseResultMap" type="org.jymf.entity.OptAction" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="LABEL_ID" property="labelId" jdbcType="BIGINT" />
+    <result column="OPT_ACTION" property="optAction" jdbcType="TINYINT" />
+    <result column="OPT_TIME" property="optTime" jdbcType="TIMESTAMP" />
+    <result column="OPT_ADDR" property="optAddr" jdbcType="INTEGER" />
+    <result column="OPT_PERSON" property="optPerson" jdbcType="BIGINT" />
+    <result column="OPT_MEMO" property="optMemo" jdbcType="VARCHAR" />
+    <result column="opt_dev_id" property="optDevId" jdbcType="BIGINT" />
+    <result column="opt_carno" property="optCarno" jdbcType="VARCHAR" />
+    <result column="cons_time_first" property="timeFirst" jdbcType="TIMESTAMP" />
+  </resultMap>
+ 
+  <select id="queryOptAction" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    SELECT 
+    	   a.label_id,
+	       b.name AS productName,
+	       b.number_id as numberId,
+	       a.cons_time_first AS timeFirst,
+	       c.OPT_TIME as optTime,
+	       c.opt_carno 
+	  FROM
+		   tbl_label_info_${t.companyId} a,
+		   tbl_product_${t.companyId} b,
+		   tbl_opt_actions_${t.companyId} c ,
+		   (SELECT MAX(Id) AS id,LABEL_ID FROM tbl_opt_actions_${t.companyId} GROUP BY LABEL_ID) d
+     WHERE
+		   a.product_id=b.id 
+	   AND (a.label_id = c.label_id OR a.package_id = c.label_id)
+	   AND a.product_id != 100 
+	   AND c.id=d.id
+	   AND c.opt_action=3
+	   AND c.OPT_TIME BETWEEN '${t.startDate} 00:00:00' AND '${t.endDate} 23:59:59'
+	   AND b.id=${t.productId}
+	 ORDER BY a.TIMESTAMP DESC
+  </select>
+
+</mapper>
